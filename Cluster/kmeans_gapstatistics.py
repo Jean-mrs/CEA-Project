@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.datasets.samples_generator import make_blobs
-
+from kneed import KneeLocator
 
 x, y = make_blobs(750, n_features=2, centers=12)
 
@@ -56,6 +56,26 @@ def optimalK(data, nrefs=3, maxClusters=15):
     return (gaps.argmax() + 1,
             resultsdf)  # Plus 1 because index of 0 means 1 cluster is optimal, index 2 = 3 clusters are optimal
 
+
+################ Elbow Method ###############
+wcss = []
+for i in range(1, 15):
+    kmeans = KMeans(i)
+    kmeans.fit(x)
+    wcss.append(kmeans.inertia_)
+plt.plot(range(1, 15), wcss)
+plt.title('The elbow method')
+plt.xlabel('Number of clusters')
+plt.ylabel('WCSS')  # within cluster sum of squares
+plt.show()
+
+# Find Elbow/Knee value
+kn = KneeLocator(range(1, 15), wcss, curve='convex', direction='decreasing')
+n_clusters = kn.knee
+print("Cluster Number: ", n_clusters)
+###############################################
+
+
 k, gapdf = optimalK(x, nrefs=5, maxClusters=15)
 print('Optimal k is: ', k)
 plt.plot(gapdf.clusterCount, gapdf.gap, linewidth=3)
@@ -84,6 +104,21 @@ plt.scatter(km.cluster_centers_[:, 0], km.cluster_centers_[:, 1], c='r', s=50, a
 plt.grid(True)
 plt.show()
 
+
+##############Elbow Kmean Plot ##################
+kmea = KMeans(n_clusters)
+kmea.fit(x)
+df['label'] = kmea.labels_
+colors = plt.get_cmap('Spectral')(np.linspace(0, 1, len(df.label.unique())))
+#colors = plt.cm.Spectral(np.linspace(0, 1, len(df.label.unique())))
+print(colors)
+for color, label in zip(colors, df.label.unique()):
+    tempdf = df[df.label == label]
+    plt.scatter(tempdf.x, tempdf.y, c=color)
+plt.scatter(kmea.cluster_centers_[:, 0], kmea.cluster_centers_[:, 1], c='r', s=50, alpha=0.7, )
+plt.grid(True)
+plt.show()
+##################################################
 
 
 num, gapdf = optimalK(km.cluster_centers_, maxClusters=5)
