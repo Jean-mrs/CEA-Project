@@ -5,7 +5,7 @@ import hashlib
 from sklearn.cluster import KMeans
 from sklearn.datasets.samples_generator import make_blobs
 
-x, y = make_blobs(750, n_features=2, centers=12)
+x, y = make_blobs(750, n_features=2, centers=15)
 plt.scatter(x[:, 0], x[:, 1])
 plt.show()
 

@@ -5,7 +5,7 @@ from sklearn.cluster import KMeans
 from sklearn.datasets.samples_generator import make_blobs
 from kneed import KneeLocator
 
-x, y = make_blobs(750, n_features=2, centers=12)
+x, y = make_blobs(750, n_features=2, centers=15)
 
 plt.scatter(x[:, 0], x[:, 1])
 plt.show()
@@ -89,6 +89,7 @@ plt.show()
 km = KMeans(k)
 km.fit(x)
 
+print(km)
 df = pd.DataFrame(x, columns=['x', 'y'])
 df['label'] = km.labels_
 
@@ -121,6 +122,7 @@ plt.show()
 ##################################################
 
 
+"""
 num, gapdf = optimalK(km.cluster_centers_, maxClusters=5)
 plt.plot(gapdf.clusterCount, gapdf.gap, linewidth=3)
 plt.scatter(gapdf[gapdf.clusterCount == num].clusterCount, gapdf[gapdf.clusterCount == num].gap, s=250, c='r')
@@ -146,3 +148,4 @@ for color, label in zip(colors, df.label.unique()):
 plt.scatter(subKm.cluster_centers_[:, 0], subKm.cluster_centers_[:, 1], c='r', s=500, alpha=0.7, )
 plt.grid(True)
 plt.show()
+"""
