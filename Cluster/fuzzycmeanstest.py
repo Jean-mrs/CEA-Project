@@ -36,8 +36,8 @@ plt.show()
 # Set up the loop and plot
 fig1, axes1 = plt.subplots(3, 3, figsize=(8, 8))
 alldata = np.vstack((xpts, ypts))
-fpcs = []
 
+fpcs = []
 for ncenters, ax in enumerate(axes1.reshape(-1), 2):
     cntr, u, u0, d, jm, p, fpc = fuzz.cluster.cmeans(
         alldata, ncenters, 2, error=0.005, maxiter=1000, init=None)
@@ -54,12 +54,11 @@ for ncenters, ax in enumerate(axes1.reshape(-1), 2):
     # Mark the center of each fuzzy cluster
     for pt in cntr:
         ax.plot(pt[0], pt[1], 'rs')
-
     ax.set_title('Centers = {0}; FPC = {1:.2f}'.format(ncenters, fpc))
     ax.axis('off')
 plt.show()
-fig1.tight_layout()
 
+fig1.tight_layout()
 fig2, ax2 = plt.subplots()
 ax2.plot(np.r_[2:11], fpcs)
 ax2.set_xlabel("Number of centers")

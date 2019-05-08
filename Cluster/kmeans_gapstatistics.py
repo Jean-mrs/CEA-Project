@@ -10,6 +10,9 @@ x, y = make_blobs(750, n_features=2, centers=15)
 plt.scatter(x[:, 0], x[:, 1])
 plt.show()
 
+print(x.shape)
+print(y)
+print("fim")
 
 def optimalK(data, nrefs=3, maxClusters=15):
     """
