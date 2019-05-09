@@ -4,6 +4,12 @@ import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.datasets.samples_generator import make_blobs
 from kneed import KneeLocator
+from scipy.spatial.distance import cdist
+from sklearn.metrics import silhouette_score
+import seaborn as sns
+
+from Cluster.optimalK_methods.gap_statistics import gap_statitics
+
 
 x, y = make_blobs(750, n_features=2, centers=15)
 
@@ -13,52 +19,6 @@ plt.show()
 print(x.shape)
 print(y)
 print("fim")
-
-def optimalK(data, nrefs=3, maxClusters=15):
-    """
-    Calculates KMeans optimal K using Gap Statistic from Tibshirani, Walther, Hastie
-    Params:
-        data: ndarry of shape (n_samples, n_features)
-        nrefs: number of sample reference datasets to create
-        maxClusters: Maximum number of clusters to test for
-    Returns: (gaps, optimalK)
-    """
-    gaps = np.zeros((len(range(1, maxClusters)),))
-    resultsdf = pd.DataFrame({'clusterCount': [], 'gap': []})
-    for gap_index, k in enumerate(range(1, maxClusters)):
-
-        # Holder for reference dispersion results
-        refDisps = np.zeros(nrefs)
-
-        # For n references, generate random sample and perform kmeans getting resulting dispersion of each loop
-        for i in range(nrefs):
-            # Create new random reference set
-            randomReference = np.random.random_sample(size=data.shape)
-
-            # Fit to it
-            km = KMeans(k)
-            km.fit(randomReference)
-
-            refDisp = km.inertia_
-            refDisps[i] = refDisp
-
-        # Fit cluster to original data and create dispersion
-        km = KMeans(k)
-        km.fit(data)
-
-        origDisp = km.inertia_
-
-        # Calculate gap statistic
-        gap = np.log(np.mean(refDisps)) - np.log(origDisp)
-
-        # Assign this loop's gap statistic to gaps
-        gaps[gap_index] = gap
-
-        resultsdf = resultsdf.append({'clusterCount': k, 'gap': gap}, ignore_index=True)
-
-    return (gaps.argmax() + 1,
-            resultsdf)  # Plus 1 because index of 0 means 1 cluster is optimal, index 2 = 3 clusters are optimal
-
 
 ################ Elbow Method ###############
 wcss = []
@@ -76,10 +36,24 @@ plt.show()
 kn = KneeLocator(range(1, 15), wcss, curve='convex', direction='decreasing')
 n_clusters = kn.knee
 print("Cluster Number: ", n_clusters)
-###############################################
 
+df = pd.DataFrame(x, columns=['x', 'y'])
 
-k, gapdf = optimalK(x, nrefs=5, maxClusters=15)
+# Plot
+kmea = KMeans(n_clusters)
+kmea.fit(x)
+df['label'] = kmea.labels_
+colors = plt.get_cmap('Spectral')(np.linspace(0, 1, len(df.label.unique())))
+#colors = plt.cm.Spectral(np.linspace(0, 1, len(df.label.unique())))
+for color, label in zip(colors, df.label.unique()):
+    tempdf = df[df.label == label]
+    plt.scatter(tempdf.x, tempdf.y, c=color)
+plt.scatter(kmea.cluster_centers_[:, 0], kmea.cluster_centers_[:, 1], c='r', s=50, alpha=0.7, )
+plt.grid(True)
+plt.show()
+
+################# Gap Statitics Method ###############
+k, gapdf = gap_statitics(x, nrefs=5, maxClusters=15)
 print('Optimal k is: ', k)
 plt.plot(gapdf.clusterCount, gapdf.gap, linewidth=3)
 plt.scatter(gapdf[gapdf.clusterCount == k].clusterCount, gapdf[gapdf.clusterCount == k].gap, s=250, c='r')
@@ -89,40 +63,52 @@ plt.ylabel('Gap Value')
 plt.title('Gap Values by Cluster Count')
 plt.show()
 
+# Plot
 km = KMeans(k)
 km.fit(x)
-
 print(km)
-df = pd.DataFrame(x, columns=['x', 'y'])
 df['label'] = km.labels_
-
 colors = plt.get_cmap('Spectral')(np.linspace(0, 1, len(df.label.unique())))
 #colors = plt.cm.Spectral(np.linspace(0, 1, len(df.label.unique())))
-
-print(colors)
 for color, label in zip(colors, df.label.unique()):
     tempdf = df[df.label == label]
     plt.scatter(tempdf.x, tempdf.y, c=color)
-
 plt.scatter(km.cluster_centers_[:, 0], km.cluster_centers_[:, 1], c='r', s=50, alpha=0.7, )
+#plt.Circle(c, r, fc='#CCCCCC', lw=3, alpha=0.5, zorder=1)
 plt.grid(True)
 plt.show()
+#######################################################
 
 
-##############Elbow Kmean Plot ##################
-kmea = KMeans(n_clusters)
-kmea.fit(x)
-df['label'] = kmea.labels_
-colors = plt.get_cmap('Spectral')(np.linspace(0, 1, len(df.label.unique())))
-#colors = plt.cm.Spectral(np.linspace(0, 1, len(df.label.unique())))
-print(colors)
-for color, label in zip(colors, df.label.unique()):
-    tempdf = df[df.label == label]
-    plt.scatter(tempdf.x, tempdf.y, c=color)
-plt.scatter(kmea.cluster_centers_[:, 0], kmea.cluster_centers_[:, 1], c='r', s=50, alpha=0.7, )
-plt.grid(True)
+########Silhouette Method########################
+s = []
+for n_clusters in range(2,30):
+    kmeans = KMeans(n_clusters=n_clusters)
+    kmeans.fit(x)
+    labels = kmeans.labels_
+    centroids = kmeans.cluster_centers_
+    s.append(silhouette_score(x, labels, metric='euclidean'))
+plt.plot(s)
+plt.ylabel("Silouette")
+plt.xlabel("k")
+plt.title("Silouette for K-means cell's behaviour")
+sns.despine()
 plt.show()
+clust = y.argmax()
+print("number of k: " + str(clust))
 ##################################################
+
+
+"""
+# plot the representation of the KMeans model
+centers = km.cluster_centers_
+radii = [cdist(x[df.label == i], km.cluster_centers_).max()
+         for i, center in enumerate(centers)]
+for c, r in zip(centers, radii):
+    plt.Circle(c, r, fc='#CCCCCC', lw=3, alpha=0.5, zorder=1)
+plt.show()
+"""
+
 
 
 """
