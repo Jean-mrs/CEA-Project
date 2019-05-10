@@ -25,6 +25,11 @@ for i, ((xmu, ymu), (xsigma, ysigma)) in enumerate(zip(centers, sigmas)):
     ypts = np.hstack((ypts, np.random.standard_normal(200) * ysigma + ymu))
     labels = np.hstack((labels, np.ones(200) * i))
 
+print(labels)
+print(type(labels))
+print(len(labels))
+print(xpts)
+print(ypts)
 # Visualize the test data
 fig0, ax0 = plt.subplots()
 for label in range(3):
@@ -57,7 +62,7 @@ for ncenters, ax in enumerate(axes1.reshape(-1), 2):
     ax.set_title('Centers = {0}; FPC = {1:.2f}'.format(ncenters, fpc))
     ax.axis('off')
 plt.show()
-
+print(fpcs)
 fig1.tight_layout()
 fig2, ax2 = plt.subplots()
 ax2.plot(np.r_[2:11], fpcs)

@@ -8,8 +8,8 @@ import sys
 sys.path.append('..')
 
 
-from fuzzycmeans.fuzzy_clustering import FCM
-from fuzzycmeans.visualization import draw_model_2d
+from Cluster.fuzzycmeans.fuzzy_clustering import FCM
+from Cluster.fuzzycmeans.visualization import draw_model_2d
 
 
 def example():
@@ -22,7 +22,7 @@ def example():
     testing_data = x
     #testing_data = np.array([[0, 1.9], [5, 3], [4, 4], [8, 9], [9.5, 6.5], [5, 5], [15,15], [12,12], [14,14], [19,10]])
     predicted_membership = fcm.predict(testing_data)
-    print ("\n\ntesting data")
+    print("\n\ntesting data")
     print(testing_data)
     print("\npredicted membership")
     print(predicted_membership)
