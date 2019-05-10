@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import skfuzzy as fuzz
-import pprint
+#import skfuzzy as fuzz
+from Cluster.fuzzycmeans.cluster._cmeans import cmeans
 import pandas as pd
 from sklearn.datasets.samples_generator import make_blobs
 
@@ -24,7 +24,8 @@ ax0.set_title('Test data: 200 points x{0} clusters.'.format(centers))
 plt.show()
 fig1, axes1 = plt.subplots()
 alldata = np.vstack((x[:, 0],  x[:, 1]))
-cntr, u, u0, d, jm, p, fpc = fuzz.cluster.cmeans(data=alldata, c=3, m=2, error=0.005, maxiter=1000, init=None)
+#cntr, u, u0, d, jm, p, fpc = fuzz.cluster.cmeans(data=alldata, c=3, m=2, error=0.005, maxiter=1000, init=None)
+cntr, u, u0, d, jm, p, fpc = cmeans(data=alldata, c=3, m=2, error=0.005, maxiter=1000, init=None)
 print(cntr)
 print(pd.DataFrame(u))
 print(pd.DataFrame(d))
