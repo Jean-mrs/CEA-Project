@@ -8,10 +8,10 @@ from scipy.spatial.distance import cdist
 from sklearn.metrics import silhouette_score
 import seaborn as sns
 
-from Cluster.optimalK_methods.gap_statistics import gap_statitics
+from Cluster.optimalK_methods.kmeans_gap_statistics import gap_statitics
 
 
-x, y = make_blobs(750, n_features=2, centers=15)
+x, y = make_blobs(2000, n_features=2, )
 
 plt.scatter(x[:, 0], x[:, 1])
 plt.show()

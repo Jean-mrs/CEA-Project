@@ -97,4 +97,4 @@ def draw_points_2d(points, fig=None, title="figure 123", **kwargs):
     output_file("output.html", title=title + " of outputfile")
     return fig
 
-example()
+#example()
