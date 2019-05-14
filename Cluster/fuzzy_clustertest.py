@@ -2,30 +2,31 @@ import numpy as np
 import matplotlib.pyplot as plt
 #import skfuzzy as fuzz
 from Cluster.fuzzycmeans.cluster._cmeans import cmeans
+from Cluster.fuzzycmeans.cluster._cmeans import cmeans_predict
 import pandas as pd
 from sklearn.datasets.samples_generator import make_blobs
-from Cluster.fuzzycmeans.visualization import draw_model_2d
+from Cluster.fuzzycmeans.cluster.visualization_graph import draw_model_2d
+import random
 
 
-#centers = [[4, 2], [1, 7], [5, 6]]
-
-points = 10
-n_clusters = 3
+points = 1000
+n_clusters = 10
 
 ###Dataset Setup
-df = pd.read_csv('/home/jean/Downloads/iris.data')
-X = df.iloc[:, :2].values
-#X = df.data[:, :2]
-print(pd.DataFrame(df))
+#x, y = make_blobs(points, n_features=2, centers=n_clusters)
+x = [random.randint(1,10000000) for j in range(points)]
+y = [random.randint(1,10000000) for i in range(points)]
+X = np.array(list(list(x) for x in zip(x, y)))
+print(type(X))
 print(X)
-x, y = make_blobs(points, n_features=2, centers=n_clusters)
-print(x)
-plt.scatter(x[:, 0], x[:, 1])
+plt.scatter(X[:, 0], X[:, 1])
 plt.show()
 
 xpts = X[:, 0]
 ypts = X[:, 1]
 alldata = np.vstack((X[:, 0],  X[:, 1]))
+print("Alldata:")
+print(alldata)
 
 ###Data Arrangement
 colors = ['b', 'orange', 'g', 'r', 'c', 'm', 'y', 'k', 'Brown', 'ForestGreen']
@@ -39,9 +40,15 @@ colors = ['b', 'orange', 'g', 'r', 'c', 'm', 'y', 'k', 'Brown', 'ForestGreen']
 ###Fuzzy C-Means Algorithm
 #cntr, u, u0, d, jm, p, fpc = fuzz.cluster.cmeans(data=alldata, c=3, m=2, error=0.005, maxiter=1000, init=None)
 cntr, u, u0, d, jm, p, fpc = cmeans(data=alldata, c=n_clusters, m=2, error=0.005, maxiter=1000, init=None)
+print("Centers Coordinates:")
 print(cntr)
+print("\n")
+print("Original Matrix: ")
 print(pd.DataFrame(d))
+print("\n")
+print("Final Matrix: ")
 print(pd.DataFrame(u))
+print("\n")
 print(jm)
 print(p)
 print(fpc)
@@ -51,11 +58,11 @@ print(fpc)
 #cluster_membership = np.argwhere(u == np.amax(u, axis=0))
 #print(cluster_membership.flatten().tolist())
 #print(np.argmax(u, axis=0))
-predict_memb = cmeans_predict(alldata, cntr_trained, m, error, maxiter, metric='euclidean', init=None,
-                   seed=None)
-
+matrix, matrix0, d, jm, p, fpc = cmeans_predict(alldata, cntr_trained=cntr, m=2, error=0.005, maxiter=1000, init=u)
+print("predict:")
+print(pd.DataFrame(np.transpose(matrix)))
 ###Plot Graph
-draw_model_2d(fcm, data=alldata, membership=cluster_membership)
+draw_model_2d(cntr, data=X, membership=np.transpose(matrix))
 
 
 #

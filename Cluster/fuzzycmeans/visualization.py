@@ -62,7 +62,7 @@ def example():
 
     output_file("markers.html", title="markers.py example")
 
-    show(p)  # open a browser
+    #show(p)  # open a browser
 
 
 def draw_model_2d(model, data=None, membership=None, show_figure=True):
