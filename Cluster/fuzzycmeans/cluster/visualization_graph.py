@@ -73,14 +73,14 @@ def draw_model_2d(cluster_centers, data=None, membership=None, show_figure=True)
     output_p = None
     for clus, cc_color in enumerate(zip(cluster_centers, color_gen())):
         cc, color = cc_color
-        fig = draw_points_2d(np.array([cc]), fig=fig, title=title, marker="diamond", size=15,
+        fig = draw_points_2d(np.array([cc]), fig=fig, title=title, marker="diamond", size=20,
                              line_color="navy", fill_color=color, alpha=1.0)
         if data is not None and membership is not None:
             for idx, data_point in enumerate(data):
                 # print idx
                 # print clus
                 print(membership[idx][clus])
-                fig = draw_points_2d(np.array([data_point]), fig=fig, title=title, marker="circle", size=10,
+                fig = draw_points_2d(np.array([data_point]), fig=fig, title=title, marker="circle", size=8,
                                      line_color="navy", fill_color=color, alpha=membership[idx][clus])
     if show_figure:
         show(fig)

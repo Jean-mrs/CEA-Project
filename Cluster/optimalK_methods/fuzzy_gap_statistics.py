@@ -4,9 +4,9 @@ from sklearn.cluster import KMeans
 from Cluster.fuzzycmeans.cluster._cmeans import cmeans
 
 
-def gap_statitics(data, nrefs=3, maxClusters=15):
+def gap_statistics_fuzzy(data, nrefs=3, maxClusters=15):
     """
-    Calculates KMeans optimal K using Gap Statistic from Tibshirani, Walther, Hastie
+    Calculates Fuzzy C-Means optimal C using Gap Statistic from Tibshirani, Walther, Hastie
     Params:
         data: ndarry of shape (n_samples, n_features)
         nrefs: number of sample reference datasets to create
@@ -26,20 +26,17 @@ def gap_statitics(data, nrefs=3, maxClusters=15):
             randomReference = np.random.random_sample(size=data.shape)
 
             # Fit to it
-            cntr, u, u0, d, jm, p, fpc = cmeans(data=data, c=c, m=2, error=0.005, maxiter=1000)
-            cm.fit(randomReference)
+            cntr, u, u0, d, jm, p, fpc = cmeans(data=randomReference, c=c, m=2, error=0.005, maxiter=1000)
 
-            refDisp = km.inertia_
-            refDisps[i] = refDisp
+            refDisps = jm
 
         # Fit cluster to original data and create dispersion
         cntr, u, u0, d, jm, p, fpc = cmeans(data=data, c=c, m=2, error=0.005, maxiter=1000)
-        cm.fit(data)
 
-        origDisp = km.inertia_
+        origDisp = jm
 
         # Calculate gap statistic
-        gap = np.log(np.mean(refDisps)) - np.log(origDisp)
+        gap = np.log(np.mean(refDisps)) - np.log(np.mean(origDisp))
 
         # Assign this loop's gap statistic to gaps
         gaps[gap_index] = gap

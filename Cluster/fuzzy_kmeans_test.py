@@ -6,12 +6,13 @@ import random
 from sklearn.cluster import KMeans
 from Cluster.fuzzycmeans.cluster._cmeans import cmeans
 from Cluster.fuzzycmeans.cluster._cmeans import cmeans_predict
-from Cluster.optimalK_methods.kmeans_gap_statistics import gap_statitics
+from Cluster.optimalK_methods.kmeans_gap_statistics import gap_statistics_kmeans
+from Cluster.optimalK_methods.fuzzy_gap_statistics import gap_statistics_fuzzy
 from Cluster.fuzzycmeans.cluster.visualization_graph import draw_model_2d
 
 
 
-points = 1000
+points = 2000
 #n_clusters = 10
 
 ###Dataset Setup
@@ -31,7 +32,7 @@ print(alldata)
 
 
 ################# Gap Statitics Method ###############
-k, gapdf = gap_statitics(X, nrefs=5, maxClusters=15)
+k, gapdf = gap_statistics_kmeans(X, nrefs=5, maxClusters=15)
 print('Optimal k is: ', k)
 plt.plot(gapdf.clusterCount, gapdf.gap, linewidth=3)
 plt.scatter(gapdf[gapdf.clusterCount == k].clusterCount, gapdf[gapdf.clusterCount == k].gap, s=250, c='r')
@@ -56,7 +57,19 @@ plt.grid(True)
 plt.show()
 
 ###Fuzzy C-Means Algorithm
-cntr, u, u0, d, jm, p, fpc = cmeans(data=alldata, c=k, m=2, error=0.005, maxiter=1000, init=None)
+###Fuzzy Gap Statitics Method
+c, gapdfs = gap_statistics_fuzzy(X, nrefs=5, maxClusters=15)
+print('Optimal C is: ', c)
+plt.plot(gapdfs.clusterCount, gapdfs.gap, linewidth=3)
+plt.scatter(gapdf[gapdfs.clusterCount == c].clusterCount, gapdf[gapdfs.clusterCount == c].gap, s=250, c='r')
+plt.grid(True)
+plt.xlabel('Cluster Count')
+plt.ylabel('Gap Value')
+plt.title('Gap Values by Cluster Count')
+plt.show()
+
+###Fuzzy C-Means Algorithm
+cntr, u, u0, d, jm, p, fpc = cmeans(data=alldata, c=c, m=2, error=0.005, maxiter=1000, init=None)
 print("Centers Coordinates:")
 print(cntr)
 print("\n")
@@ -66,7 +79,9 @@ print("\n")
 print("Final Matrix: ")
 print(pd.DataFrame(u))
 print("\n")
+print("Object Function: ")
 print(jm)
+print("\n")
 print(p)
 print(fpc)
 
