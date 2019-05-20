@@ -29,16 +29,12 @@ def gap_statistics_kmeans(data, nrefs=3, maxClusters=15):
             km.fit(randomReference)
 
             refDisp = km.inertia_
-            print("WkSample: ")
-            print(km.inertia_)
             refDisps[i] = refDisp
 
         # Fit cluster to original data and create dispersion
         km = KMeans(k)
         km.fit(data)
 
-        print("WkPopu: ")
-        print(km.inertia_)
         origDisp = km.inertia_
 
         # Calculate gap statistic

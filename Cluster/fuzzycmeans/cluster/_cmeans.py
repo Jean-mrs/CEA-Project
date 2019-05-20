@@ -26,8 +26,11 @@ def _cmeans0(data, u_old, c, m, metric):
     cntr = um.dot(data) / np.atleast_2d(um.sum(axis=1)).T
 
     d = _distance(data, cntr, metric)
+    print("d Original:")
+    print(d)
     d = np.fmax(d, np.finfo(np.float64).eps)
-
+    print("D alterado:")
+    print(d)
     jm = (um * d ** 2).sum()
 
     u = normalize_power_columns(d, - 2. / (m - 1))
@@ -305,40 +308,3 @@ def _cmeans_predict0(test_data, cntr, u_old, c, m, metric):
     u = normalize_power_columns(d, - 2. / (m - 1))
 
     return u, jm, d
-
-def fit(self, X, y=None, hard=True):
-    """
-    :param X:
-    :param y: list of clusters or a membership, now only support the hard y list which will generate
-    the membership
-    :param hard: whether y contains a list of clusters or a membership matrix
-    :return: self
-    """
-    X = np.array(X)
-    if y is not None:
-        y = np.array(y)
-        if hard:
-            self.set_membership_from_hard_cluster(X, y)
-    if self.cluster_centers_ is None:
-        do_compute_cluster_centers = True
-    else:
-        do_compute_cluster_centers = False
-    if self.u is None:
-        num_of_points = X.shape[0]
-        self.init_membership_random(num_of_points)
-    #self.init_membership(X.shape[0])
-    list_of_centers = []
-    membership_history = []
-    membership_history.append(self.u.copy())
-    for i in range(self.max_iter):
-        if do_compute_cluster_centers:
-            centers = self.compute_cluster_centers(X)
-            if i == 0:
-                init_centers = centers
-            list_of_centers.append(centers)
-        else:
-            init_centers = self.cluster_centers_
-            list_of_centers = [init_centers]
-        self.update_membership(X)
-        membership_history.append(self.u.copy())
-    return self

@@ -11,7 +11,7 @@ def gap_statistics_fuzzy(data, nrefs=3, maxClusters=15):
         data: ndarry of shape (n_samples, n_features)
         nrefs: number of sample reference datasets to create
         maxClusters: Maximum number of clusters to test for
-    Returns: (gaps, optimalK)
+    Returns: (gaps, optimalC)
     """
     gaps = np.zeros((len(range(1, maxClusters)),))
     resultsdf = pd.DataFrame({'clusterCount': [], 'gap': []})
