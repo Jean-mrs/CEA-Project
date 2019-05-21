@@ -12,7 +12,7 @@ from Cluster.fuzzycmeans.cluster.visualization_graph import draw_model_2d
 
 
 
-points = 2000
+points = 20
 #n_clusters = 10
 
 ###Dataset Setup
@@ -70,28 +70,29 @@ plt.show()
 
 ###Fuzzy C-Means Algorithm
 cntr, u, u0, d, jm, p, fpc = cmeans(data=alldata, c=c, m=2, error=0.005, maxiter=1000, init=None)
-print("Centers Coordinates:")
-print(cntr)
+#print("Centers Coordinates:")
+#print(cntr)
 print("\n")
-print("Original Matrix: ")
-print(pd.DataFrame(u0))
+#print("Original Matrix: ")
+#print(pd.DataFrame(u0))
 print("\n")
 print("Final Matrix: ")
 print(pd.DataFrame(u))
 print("\n")
-print("Object Function: ")
-print(jm)
+#print("Object Function: ")
+#print(jm)
 print("\n")
 print("Euclidian Distance Matrix: ")
 print(pd.DataFrame(d))
 print("\n")
-print(p)
-print(fpc)
+#print(p)
+#print(fpc)
 
-matrix, matrix0, d, jm, p, fpc = cmeans_predict(alldata, cntr_trained=cntr, m=2, error=0.005, maxiter=1000, init=u)
+matrix, matrix0, d, jm1, p2, fpc2 = cmeans_predict(alldata, cntr_trained=cntr, m=2, error=0.005, maxiter=1000, init=u)
 print("predict:")
 print(pd.DataFrame(np.transpose(matrix)))
-
+print(pd.DataFrame(d))
+print(type(d))
 ###Plot Graph
 #draw_model_2d(cntr, data=X, membership=np.transpose(matrix))
 

@@ -2,6 +2,7 @@
 cmeans.py : Fuzzy C-means clustering algorithm.
 """
 import numpy as np
+import pandas as pd
 from scipy.spatial.distance import cdist
 from Cluster.fuzzycmeans.cluster.normalize_columns import normalize_columns, normalize_power_columns
 
@@ -26,11 +27,7 @@ def _cmeans0(data, u_old, c, m, metric):
     cntr = um.dot(data) / np.atleast_2d(um.sum(axis=1)).T
 
     d = _distance(data, cntr, metric)
-    print("d Original:")
-    print(d)
     d = np.fmax(d, np.finfo(np.float64).eps)
-    print("D alterado:")
-    print(d)
     jm = (um * d ** 2).sum()
 
     u = normalize_power_columns(d, - 2. / (m - 1))
@@ -302,9 +299,25 @@ def _cmeans_predict0(test_data, cntr, u_old, c, m, metric):
 
     d = _distance(test_data, cntr, metric)
     d = np.fmax(d, np.finfo(np.float64).eps)
+    d = range_limit(d)
 
     jm = (um * d ** 2).sum()
 
     u = normalize_power_columns(d, - 2. / (m - 1))
 
     return u, jm, d
+
+
+def range_limit(d, max=10000):
+    df = pd.DataFrame(d)
+    for column in df.columns[0:]:
+        for item in df[column]:
+            if item >= 0.7 * max:
+                df.replace(item, max, True)
+            if item >= 0.8 * max:
+                df.replace(item, max, True)
+            if item >= 0.9 * max:
+                df.replace(item, max, True)
+    return np.array(df)
+
+
