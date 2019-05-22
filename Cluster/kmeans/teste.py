@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 df = pd.DataFrame([[2,3,4], [5,1,9], [2,7,9], [1,6,9], [8,3,5]])
 af = pd.DataFrame([[2,3,4], [5,1,9], [10,7,9]])
 print(df)
@@ -14,4 +15,4 @@ for column in df.columns[0:]:
         elif item <= 0.2*max:
             df.replace(item, 0, True)
 
-print(df)
+print(np.array(df))

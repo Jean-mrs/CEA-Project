@@ -28,6 +28,8 @@ def _cmeans0(data, u_old, c, m, metric):
 
     d = _distance(data, cntr, metric)
     d = np.fmax(d, np.finfo(np.float64).eps)
+    d = range_limit(d)
+
     jm = (um * d ** 2).sum()
 
     u = normalize_power_columns(d, - 2. / (m - 1))
@@ -308,16 +310,10 @@ def _cmeans_predict0(test_data, cntr, u_old, c, m, metric):
     return u, jm, d
 
 
-def range_limit(d, max=10000):
+def range_limit(d, max=2500):
     df = pd.DataFrame(d)
     for column in df.columns[0:]:
         for item in df[column]:
-            if item >= 0.7 * max:
-                df.replace(item, max, True)
-            if item >= 0.8 * max:
-                df.replace(item, max, True)
-            if item >= 0.9 * max:
-                df.replace(item, max, True)
+            if item >= max:
+                df.replace(item, 10000, True)
     return np.array(df)
-
-

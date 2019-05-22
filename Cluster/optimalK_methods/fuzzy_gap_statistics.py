@@ -1,12 +1,11 @@
 import numpy as np
 import pandas as pd
-from sklearn.cluster import KMeans
 from Cluster.fuzzycmeans.cluster._cmeans import cmeans
 
 
 def gap_statistics_fuzzy(data, nrefs=3, maxClusters=15):
     """
-    Calculates Fuzzy C-Means optimal C using Gap Statistic from Tibshirani, Walther, Hastie
+    Calculates Fuzzy C-Means optimal C using Gap Statistic from Sentelle, Hong, Georgiopoulos, Anagnostopoulos
     Params:
         data: ndarry of shape (n_samples, n_features)
         nrefs: number of sample reference datasets to create
