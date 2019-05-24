@@ -9,7 +9,7 @@ from Cluster.optimalK_methods.fuzzy_gap_statistics import gap_statistics_fuzzy
 from Cluster.fuzzycmeans.cluster.visualization_graph import draw_model_2d
 
 
-points = 30
+points = 1000
 
 # Data Setup
 x = [random.randint(1, 10000) for j in range(points)]
@@ -30,7 +30,7 @@ plt.scatter(gapdf[gapdf.clusterCount == k].clusterCount, gapdf[gapdf.clusterCoun
 plt.grid(True)
 plt.xlabel('Cluster Count')
 plt.ylabel('Gap Value')
-plt.title('Gap Values by Cluster Count')
+plt.title('Gap Values by Cluster Count (K-Means)')
 plt.show()
 
 # K-means Algorithm
@@ -57,7 +57,7 @@ plt.scatter(gapdfs[gapdfs.clusterCount == c].clusterCount, gapdfs[gapdfs.cluster
 plt.grid(True)
 plt.xlabel('Cluster Count')
 plt.ylabel('Gap Value')
-plt.title('Gap Values by Cluster Count')
+plt.title('Gap Values by Cluster Count (Fuzzy C-Means)')
 plt.show()
 
 # Fuzzy C-Means Algorithm
