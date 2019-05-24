@@ -42,6 +42,8 @@ def gap_statistics_fuzzy(data, nrefs=3, maxClusters=15):
 
         resultsdf = resultsdf.append({'clusterCount': c, 'gap': gap}, ignore_index=True)
 
-    return (gaps.argmax() + 1,
-            resultsdf)  # Plus 1 because index of 0 means 1 cluster is optimal, index 2 = 3 clusters are optimal
+    return sorted([y for index, y in enumerate(gaps) if index <= gaps.argmax()][:3], reverse=True), resultsdf
+
+    #return (gaps.argmax() + 1,
+     #       resultsdf)  # Plus 1 because index of 0 means 1 cluster is optimal, index 2 = 3 clusters are optimal
 
