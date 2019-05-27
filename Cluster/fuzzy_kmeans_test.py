@@ -49,32 +49,32 @@ alldata = np.vstack((xpts,  ypts))
 # plt.grid(True)
 # plt.show()
 
-# Fuzzy Gap Statistics
-c, gapdfs = gap_statistics_fuzzy(X, nrefs=5, maxClusters=30)
-print('Optimal C is: ', c)
-plt.plot(gapdfs.clusterCount, gapdfs.gap, linewidth=3)
-plt.scatter(gapdfs[gapdfs.clusterCount == c[0]].clusterCount, gapdfs[gapdfs.clusterCount == c[0]].gap, s=250, c='r')
-plt.grid(True)
-plt.xlabel('Cluster Count')
-plt.ylabel('Gap Value')
-plt.title('Gap Values by Cluster Count (Fuzzy C-Means)')
-plt.show()
+# # Fuzzy Gap Statistics
+# c, gapdfs = gap_statistics_fuzzy(X, nrefs=5, maxClusters=30)
+# print('Optimal C is: ', c)
+# plt.plot(gapdfs.clusterCount, gapdfs.gap, linewidth=3)
+# plt.scatter(gapdfs[gapdfs.clusterCount == c[0]].clusterCount, gapdfs[gapdfs.clusterCount == c[0]].gap, s=250, c='r')
+# plt.grid(True)
+# plt.xlabel('Cluster Count')
+# plt.ylabel('Gap Value')
+# plt.title('Gap Values by Cluster Count (Fuzzy C-Means)')
+# plt.show()
 
 # Fuzzy C-Means Algorithm
-for i in range(len(c)):
-    cntr, u, u0, d, jm, p, fpc = cmeans(data=alldata, c=c[i], m=2, error=0.005, maxiter=1000, init=None)
-    print("Euclidian Distance Matrix: ")
-    print(pd.DataFrame(d))
-    print("\n")
-    print("Final Matrix: ")
-    print(pd.DataFrame(u))
-    print("\n")
 
-    # Plot Fuzzy
-    #draw_model_2d(cntr, data=X, membership=np.transpose(u))
+cntr, u, u0, d, jm, p, fpc = cmeans(data=alldata, c=10, m=2, error=0.005, maxiter=1000, init=None)
+print("Euclidian Distance Matrix: ")
+print(pd.DataFrame(d))
+print("\n")
+print("Final Matrix: ")
+print(pd.DataFrame(u))
+print("\n")
 
-    # Save Output
-    X_df = pd.DataFrame(X)
-    cntr_df = pd.DataFrame(cntr)
-    export_csv = cntr_df.to_csv(r'/home/jean/Documentos/CEA-ML/Cluster/Output/gateways' + str(i) + '.csv', header=True)
-    export_csv2 = X_df.to_csv(r'/home/jean/Documentos/CEA-ML/Cluster/Output/devices' + str(i) + '.csv', header=True)
+# Plot Fuzzy
+#draw_model_2d(cntr, data=X, membership=np.transpose(u))
+
+# Save Output
+X_df = pd.DataFrame(X)
+cntr_df = pd.DataFrame(cntr)
+export_csv = cntr_df.to_csv(r'/home/jean/Documentos/CEA-ML/Cluster/Output/gateways'  + '.csv', header=True)
+export_csv2 = X_df.to_csv(r'/home/jean/Documentos/CEA-ML/Cluster/Output/devices' + '.csv', header=True)
