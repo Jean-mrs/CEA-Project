@@ -11,7 +11,7 @@ from Cluster.fuzzycmeans.cluster.visualization_graph import draw_model_2d
 points = 1000
 axis_range = 10000
 
-for w in range(10):
+for w in range(5):
     x = [random.randint(1, axis_range) for j in range(points)]
     y = [random.randint(1, axis_range) for i in range(points)]
     X = np.array(list(list(x) for x in zip(x, y)))
