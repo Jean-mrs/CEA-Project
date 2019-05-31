@@ -11,7 +11,7 @@ from Cluster.fuzzycmeans.cluster.visualization_graph import draw_model_2d
 points = 1000
 axis_range = 10000
 
-for w in range(5):
+for w in range(1):
     x = [random.randint(1, axis_range) for j in range(points)]
     y = [random.randint(1, axis_range) for i in range(points)]
     X = np.array(list(list(x) for x in zip(x, y)))
@@ -25,7 +25,7 @@ for w in range(5):
     alldata = np.vstack((xpts,  ypts))
 
     # Fuzzy Gap Statistics
-    c, gapdfs = gap_statistics_fuzzy(X, nrefs=5, maxClusters=30)
+    c, gapdfs = gap_statistics_fuzzy(X, nrefs=500, maxClusters=30)
 
     # Fuzzy C-Means Algorithm
     for i in range(len(c)):

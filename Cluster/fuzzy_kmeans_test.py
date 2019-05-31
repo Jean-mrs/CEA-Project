@@ -11,7 +11,7 @@ from gap_statistic import OptimalK
 from sklearn.datasets.samples_generator import make_blobs
 
 
-points = 1000
+points = 50
 
 
 # Data Setup
@@ -43,28 +43,40 @@ X = np.array(list(list(x) for x in zip(x, y)))
 #K-means Gap Statistics
 k, gapdf = gap_statistics_kmeans(X, nrefs=5, maxClusters=30)
 print('Optimal k is: ', k)
-plt.plot(gapdf.clusterCount, gapdf.gap, linewidth=3)
-plt.scatter(gapdf[gapdf.clusterCount == k].clusterCount, gapdf[gapdf.clusterCount == k].gap, s=250, c='r')
-plt.grid(True)
-plt.xlabel('Cluster Count')
-plt.ylabel('Gap Value')
-plt.title('Gap Values by Cluster Count (K-Means)')
-plt.show()
-
-# K-means Algorithm
-km = KMeans(k)
-km.fit(X)
-
-# Plot K-means
-df = pd.DataFrame(X, columns=['x', 'y'])
-df['label'] = km.labels_
-colors = plt.get_cmap('Spectral')(np.linspace(0, 1, len(df.label.unique())))
-for color, label in zip(colors, df.label.unique()):
-    tempdf = df[df.label == label]
-    plt.scatter(tempdf.x, tempdf.y, c=color, s=10)
-plt.scatter(km.cluster_centers_[:, 0], km.cluster_centers_[:, 1], c='r', s=30, alpha=0.7, )
-plt.grid(True)
-plt.show()
+k, gapdfa = gap_statistics_kmeans(X, nrefs=30, maxClusters=30)
+print('Optimal k is: ', k)
+k, gapdfb = gap_statistics_kmeans(X, nrefs=50, maxClusters=30)
+print('Optimal k is: ', k)
+k, gapdfc = gap_statistics_kmeans(X, nrefs=100, maxClusters=30)
+print('Optimal k is: ', k)
+k, gapdfd = gap_statistics_kmeans(X, nrefs=150, maxClusters=30)
+print('Optimal k is: ', k)
+k, gapdfe = gap_statistics_kmeans(X, nrefs=300, maxClusters=30)
+print('Optimal k is: ', k)
+k, gapdff = gap_statistics_kmeans(X, nrefs=500, maxClusters=30)
+print('Optimal k is: ', k)
+# plt.plot(gapdf.clusterCount, gapdf.gap, linewidth=3)
+# plt.scatter(gapdf[gapdf.clusterCount == k].clusterCount, gapdf[gapdf.clusterCount == k].gap, s=250, c='r')
+# plt.grid(True)
+# plt.xlabel('Cluster Count')
+# plt.ylabel('Gap Value')
+# plt.title('Gap Values by Cluster Count (K-Means)')
+# plt.show()
+#
+# # K-means Algorithm
+# km = KMeans(k)
+# km.fit(X)
+#
+# # Plot K-means
+# df = pd.DataFrame(X, columns=['x', 'y'])
+# df['label'] = km.labels_
+# colors = plt.get_cmap('Spectral')(np.linspace(0, 1, len(df.label.unique())))
+# for color, label in zip(colors, df.label.unique()):
+#     tempdf = df[df.label == label]
+#     plt.scatter(tempdf.x, tempdf.y, c=color, s=10)
+# plt.scatter(km.cluster_centers_[:, 0], km.cluster_centers_[:, 1], c='r', s=30, alpha=0.7, )
+# plt.grid(True)
+# plt.show()
 
 # # Fuzzy Gap Statistics
 # c, gapdfs = gap_statistics_fuzzy(X, nrefs=5, maxClusters=30)

@@ -5,6 +5,7 @@ import pandas as pd
 from sklearn import datasets
 import pprint
 import random
+import pprint
 
 style.use('ggplot')
 
