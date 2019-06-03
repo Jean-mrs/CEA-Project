@@ -1,11 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 #import skfuzzy as fuzz
-from Cluster.fuzzycmeans.cluster._cmeans import cmeans
-from Cluster.fuzzycmeans.cluster._cmeans import cmeans_predict
+from Cluster.fuzzycmeans.cmeans import cmeans
+from Cluster.fuzzycmeans.cmeans import cmeans_predict
 import pandas as pd
-from sklearn.datasets.samples_generator import make_blobs
-from Cluster.fuzzycmeans.cluster.visualization_graph import draw_model_2d
+from Cluster.fuzzycmeans.visualization_graph import draw_model_2d
 import random
 
 

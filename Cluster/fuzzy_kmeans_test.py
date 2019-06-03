@@ -1,15 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
 import random
-from sklearn.cluster import KMeans
-from Cluster.fuzzycmeans.cluster._cmeans import cmeans
 from Cluster.optimalK_methods.kmeans_gap_statistics import gap_statistics_kmeans
-from Cluster.optimalK_methods.fuzzy_gap_statistics import gap_statistics_fuzzy
-from Cluster.fuzzycmeans.cluster.visualization_graph import draw_model_2d
-from gap_statistic import OptimalK
-from sklearn.datasets.samples_generator import make_blobs
-
 
 points = 50
 

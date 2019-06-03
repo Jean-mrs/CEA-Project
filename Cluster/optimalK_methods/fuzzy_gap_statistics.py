@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from Cluster.fuzzycmeans.cluster._cmeans import cmeans
+from Cluster.fuzzycmeans.cmeans import cmeans
 
 
 def gap_statistics_fuzzy(data, nrefs=3, maxClusters=15):
