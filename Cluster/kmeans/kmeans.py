@@ -6,6 +6,7 @@ from sklearn import datasets
 import pprint
 import random
 import pprint
+print('a')
 
 style.use('ggplot')
 

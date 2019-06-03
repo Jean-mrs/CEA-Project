@@ -5,6 +5,7 @@ from sklearn.cluster import KMeans
 from sklearn import datasets
 from kneed import KneeLocator
 import random
+import pprint
 
 points = 1000
 
