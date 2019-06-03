@@ -9,8 +9,8 @@ import sys
 sys.path.append('..')
 
 
-from Cluster.fuzzycmeans.fuzzy_clustering import FCM
-from Cluster.fuzzycmeans.visualization import draw_model_2d
+from cluster.fuzzycmeans.fuzzy_clustering import FCM
+from cluster.fuzzycmeans.visualization import draw_model_2d
 
 
 def example():

@@ -8,7 +8,7 @@ from scipy.spatial.distance import cdist
 from sklearn.metrics import silhouette_score
 import seaborn as sns
 
-from Cluster.optimalK_methods.kmeans_gap_statistics import gap_statitics
+from cluster.optimalK_methods.kmeans_gap_statistics import gap_statitics
 
 
 x, y = make_blobs(2000, n_features=2, )
@@ -35,7 +35,7 @@ plt.show()
 # Find Elbow/Knee value
 kn = KneeLocator(range(1, 15), wcss, curve='convex', direction='decreasing')
 n_clusters = kn.knee
-print("Cluster Number: ", n_clusters)
+print("cluster Number: ", n_clusters)
 
 df = pd.DataFrame(x, columns=['x', 'y'])
 
@@ -58,9 +58,9 @@ print('Optimal k is: ', k)
 plt.plot(gapdf.clusterCount, gapdf.gap, linewidth=3)
 plt.scatter(gapdf[gapdf.clusterCount == k].clusterCount, gapdf[gapdf.clusterCount == k].gap, s=250, c='r')
 plt.grid(True)
-plt.xlabel('Cluster Count')
+plt.xlabel('cluster Count')
 plt.ylabel('Gap Value')
-plt.title('Gap Values by Cluster Count')
+plt.title('Gap Values by cluster Count')
 plt.show()
 
 # Plot
@@ -116,9 +116,9 @@ num, gapdf = optimalK(km.cluster_centers_, maxClusters=5)
 plt.plot(gapdf.clusterCount, gapdf.gap, linewidth=3)
 plt.scatter(gapdf[gapdf.clusterCount == num].clusterCount, gapdf[gapdf.clusterCount == num].gap, s=250, c='r')
 plt.grid(True)
-plt.xlabel('Cluster Count')
+plt.xlabel('cluster Count')
 plt.ylabel('Gap Value')
-plt.title('Gap Values by Cluster Count')
+plt.title('Gap Values by cluster Count')
 plt.show()
 
 

@@ -1,10 +1,10 @@
 """
-cmeans.py : Fuzzy C-means clustering algorithm.
+cmeans_algorithm.py : Fuzzy C-means clustering algorithm.
 """
 import numpy as np
 import pandas as pd
 from scipy.spatial.distance import cdist
-from Cluster.fuzzycmeans.normalize_columns import normalize_columns, normalize_power_columns
+from cluster.fuzzycmeans.normalize_columns import normalize_columns, normalize_power_columns
 
 
 def _cmeans0(data, u_old, c, m, metric):
@@ -46,7 +46,7 @@ def _distance(data, centers, metric='euclidean'):
     data : 2d array (N x Q)
         Data to be analyzed. There are N data points.
     centers : 2d array (C x Q)
-        Cluster centers. There are C clusters, with Q features.
+        cluster centers. There are C clusters, with Q features.
     metric: string
         By default is set to euclidean. Passes any option accepted by
         ``scipy.spatial.distance.cdist``.
@@ -115,7 +115,7 @@ def cmeans(data, c, m, error, maxiter, metric='euclidean', init=None, seed=None)
     Returns
     -------
     cntr : 2d array, size (S, c)
-        Cluster centers.  Data for each center along each feature provided
+        cluster centers.  Data for each center along each feature provided
         for every cluster (of the `c` requested clusters).
     u : 2d array, (S, N)
         Final fuzzy c-partitioned matrix.

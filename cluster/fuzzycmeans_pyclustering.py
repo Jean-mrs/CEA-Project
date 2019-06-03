@@ -1,6 +1,6 @@
 """!
 
-@brief Cluster analysis algorithm: Fuzzy C-Means
+@brief cluster analysis algorithm: Fuzzy C-Means
 @details Implementation based on paper @cite book::pattern_recognition_with_fuzzy.
 
 @authors Andrei Novikov (pyclustering@yandex.ru)
@@ -176,7 +176,7 @@ class fcm:
         """!
         @brief Returns list of centers of allocated clusters.
 
-        @return (array_like) Cluster centers.
+        @return (array_like) cluster centers.
 
         @see process()
         @see get_clusters()

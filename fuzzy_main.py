@@ -2,12 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import random
-from Cluster.fuzzycmeans.cmeans import cmeans
-from Cluster.optimalK_methods.fuzzy_gap_statistics import gap_statistics_fuzzy
+from cluster.fuzzycmeans.cmeans_algorithm import cmeans
+from cluster.optimalK_methods.fuzzy_gap_statistics import gap_statistics_fuzzy
 
 # Data Setup
 points = 1000
-axis_range = 10000
+axis_range = 100
 
 for w in range(1):
     x = [random.randint(1, axis_range) for j in range(points)]
@@ -16,8 +16,8 @@ for w in range(1):
     X_df = pd.DataFrame(X)
     fig1 = plt.figure()
     plt.scatter(X[:, 0], X[:, 1], s=10)
-    #plt.savefig("sftp://192.168.1.2/home/jean/CEA-ML/Cluster/Output/Data_Users_" + str(axis_range) + '_Sim' + str(w))
-    plt.savefig("/home/jean/Documentos/CEA-ML/Cluster/Output/Data_Users_" + str(axis_range) + '_Sim' + str(w))
+    #plt.savefig("sftp://192.168.1.2/home/jean/CEA-ML/cluster/Output/Data_Users_" + str(axis_range) + '_Sim' + str(w))
+    plt.savefig("/home/jean/Documentos/CEA-ML/cluster/Output/Data_Users_" + str(axis_range) + '_Sim' + str(w))
 
     xpts = X[:, 0]
     ypts = X[:, 1]
@@ -33,11 +33,11 @@ for w in range(1):
         plt.plot(gapdfs.clusterCount, gapdfs.gap, linewidth=3)
         plt.scatter(gapdfs[gapdfs.clusterCount == c[i]].clusterCount, gapdfs[gapdfs.clusterCount == c[i]].gap, s=250, c='r')
         plt.grid(True)
-        plt.xlabel('Cluster Count')
+        plt.xlabel('cluster Count')
         plt.ylabel('Gap Value')
-        plt.title('Cluster Number' + str(i) + '(Fuzzy C-Means)')
-        plt.savefig("/home/jean/Documentos/CEA-ML/Cluster/Output/Gap_" + str(axis_range) + "_Best" + str(i) + '_Sim' + str(w))
-        #plt.savefig("sftp://192.168.1.2/home/jean/CEA-ML/Cluster/Output/Gap_" + str(axis_range) + "_Best" + str(i) + '_Sim' + str(w))
+        plt.title('cluster Number' + str(i) + '(Fuzzy C-Means)')
+        plt.savefig("/home/jean/Documentos/CEA-ML/cluster/Output/Gap_" + str(axis_range) + "_Best" + str(i) + '_Sim' + str(w))
+        #plt.savefig("sftp://192.168.1.2/home/jean/CEA-ML/cluster/Output/Gap_" + str(axis_range) + "_Best" + str(i) + '_Sim' + str(w))
 
         cntr, u, u0, d, jm, p, fpc = cmeans(data=alldata, c=c[i], m=2, error=0.005, maxiter=1000, init=None)
         print("Euclidian Distance Matrix: ")
@@ -52,7 +52,7 @@ for w in range(1):
 
         # Save Output
         cntr_df = pd.DataFrame(cntr)
-        #export_csv = cntr_df.to_csv(r'sftp://192.168.1.2/home/jean/CEA-ML/Cluster/Output/gw_' + str(axis_range) + "_Best" + str(i) + '_Sim' + str(w) + '.csv', header=True)
-        export_csv = cntr_df.to_csv(r'/home/jean/Documentos/CEA-ML/Cluster/Output/gw_' + str(axis_range) + "_Best" + str(i) + '_Sim' + str(w) + '.csv', header=True)
-    #export_csv2 = X_df.to_csv(r'sftp://192.168.1.2/home/jean/CEA-ML/Cluster/Output/User_' + str(axis_range) + '_Sim' + str(w) + '.csv', header=True)
-    export_csv2 = X_df.to_csv(r'/home/jean/Documentos/CEA-ML/Cluster/Output/User_' + str(axis_range) + '_Sim' + str(w) + '.csv', header=True)
+        #export_csv = cntr_df.to_csv(r'sftp://192.168.1.2/home/jean/CEA-ML/cluster/Output/gw_' + str(axis_range) + "_Best" + str(i) + '_Sim' + str(w) + '.csv', header=True)
+        export_csv = cntr_df.to_csv(r'/home/jean/Documentos/CEA-ML/cluster/Output/gw_' + str(axis_range) + "_Best" + str(i) + '_Sim' + str(w) + '.csv', header=True)
+    #export_csv2 = X_df.to_csv(r'sftp://192.168.1.2/home/jean/CEA-ML/cluster/Output/User_' + str(axis_range) + '_Sim' + str(w) + '.csv', header=True)
+    export_csv2 = X_df.to_csv(r'/home/jean/Documentos/CEA-ML/cluster/Output/User_' + str(axis_range) + '_Sim' + str(w) + '.csv', header=True)

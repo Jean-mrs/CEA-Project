@@ -1,6 +1,6 @@
 import numpy as np
 import random
-from Cluster.optimalK_methods.kmeans_gap_statistics import gap_statistics_kmeans
+from cluster.optimalK_methods.kmeans_gap_statistics import gap_statistics_kmeans
 
 points = 50
 
@@ -26,9 +26,9 @@ X = np.array(list(list(x) for x in zip(x, y)))
 # plt.scatter(optimalK.gap_df[optimalK.gap_df.n_clusters == n_clusters].n_clusters,
 #             optimalK.gap_df[optimalK.gap_df.n_clusters == n_clusters].gap_value, s=250, c='r')
 # plt.grid(True)
-# plt.xlabel('Cluster Count')
+# plt.xlabel('cluster Count')
 # plt.ylabel('Gap Value')
-# plt.title('Gap Values by Cluster Count')
+# plt.title('Gap Values by cluster Count')
 # plt.show()
 
 #K-means Gap Statistics
@@ -49,9 +49,9 @@ print('Optimal k is: ', k)
 # plt.plot(gapdf.clusterCount, gapdf.gap, linewidth=3)
 # plt.scatter(gapdf[gapdf.clusterCount == k].clusterCount, gapdf[gapdf.clusterCount == k].gap, s=250, c='r')
 # plt.grid(True)
-# plt.xlabel('Cluster Count')
+# plt.xlabel('cluster Count')
 # plt.ylabel('Gap Value')
-# plt.title('Gap Values by Cluster Count (K-Means)')
+# plt.title('Gap Values by cluster Count (K-Means)')
 # plt.show()
 #
 # # K-means Algorithm
@@ -75,9 +75,9 @@ print('Optimal k is: ', k)
 # plt.plot(gapdfs.clusterCount, gapdfs.gap, linewidth=3)
 # plt.scatter(gapdfs[gapdfs.clusterCount == c[0]].clusterCount, gapdfs[gapdfs.clusterCount == c[0]].gap, s=250, c='r')
 # plt.grid(True)
-# plt.xlabel('Cluster Count')
+# plt.xlabel('cluster Count')
 # plt.ylabel('Gap Value')
-# plt.title('Gap Values by Cluster Count (Fuzzy C-Means)')
+# plt.title('Gap Values by cluster Count (Fuzzy C-Means)')
 # plt.show()
 #
 # # Fuzzy C-Means Algorithm
@@ -96,5 +96,5 @@ print('Optimal k is: ', k)
 # Save Output
 # X_df = pd.DataFrame(X)
 # cntr_df = pd.DataFrame(cntr)
-# export_csv = cntr_df.to_csv(r'/home/jean/Documentos/CEA-ML/Cluster/Output/gateways'  + '.csv', header=True)
-# export_csv2 = X_df.to_csv(r'/home/jean/Documentos/CEA-ML/Cluster/Output/devices' + '.csv', header=True)
+# export_csv = cntr_df.to_csv(r'/home/jean/Documentos/CEA-ML/cluster/Output/gateways'  + '.csv', header=True)
+# export_csv2 = X_df.to_csv(r'/home/jean/Documentos/CEA-ML/cluster/Output/devices' + '.csv', header=True)

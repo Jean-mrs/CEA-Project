@@ -1,10 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 #import skfuzzy as fuzz
-from Cluster.fuzzycmeans.cmeans import cmeans
-from Cluster.fuzzycmeans.cmeans import cmeans_predict
+from cluster.fuzzycmeans.cmeans_algorithm import cmeans
+from cluster.fuzzycmeans.cmeans_algorithm import cmeans_predict
 import pandas as pd
-from Cluster.fuzzycmeans.visualization_graph import draw_model_2d
+from cluster.fuzzycmeans.visualization_graph import draw_model_2d
 import random
 
 
@@ -52,7 +52,7 @@ print(jm)
 print(p)
 print(fpc)
 
-###Cluster Membership
+###cluster Membership
 #cluster_membership = np.argmax(u, axis=0)
 #cluster_membership = np.argwhere(u == np.amax(u, axis=0))
 #print(cluster_membership.flatten().tolist())

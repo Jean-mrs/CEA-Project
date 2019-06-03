@@ -4,11 +4,11 @@ class OptimalK:
         Tibshirani, Walther, Hastie
         http://www.web.stanford.edu/~hastie/Papers/gap.pdf
     Example:
-    >>> from sklearn.datasets.samples_generator import make_blobs
-    >>> from gap_statistic import OptimalK
-    >>> X, y = make_blobs(n_samples=int(1e5), n_features=2, centers=3, random_state=100)
-    >>> optimalK = OptimalK(parallel_backend='joblib')
-    >>> optimalK(X, cluster_array=[1,2,3,4,5])
+     from sklearn.datasets.samples_generator import make_blobs
+     from gap_statistic import OptimalK
+    X, y = make_blobs(n_samples=int(1e5), n_features=2, centers=3, random_state=100)
+     optimalK = OptimalK(parallel_backend='joblib')
+     optimalK(X, cluster_array=[1,2,3,4,5])
     3
     """
 

@@ -8,4 +8,4 @@ __all__ = ['cmeans',
            'cmeans_predict',
            ]
 
-from .cmeans import cmeans, cmeans_predict
+from .cmeans_algorithm import cmeans, cmeans_predict

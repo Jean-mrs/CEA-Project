@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import random
-from Cluster.kmeans.kmeans import K_Means
-from Cluster.optimalK_methods.kmeans_gap_statistics import gap_statistics_kmeans
+from cluster.kmeans.kmeans import K_Means
+from cluster.optimalK_methods.kmeans_gap_statistics import gap_statistics_kmeans
 
 
 points = 1000
@@ -25,9 +25,9 @@ print('Optimal k is: ', k)
 plt.plot(gapdf.clusterCount, gapdf.gap, linewidth=3)
 plt.scatter(gapdf[gapdf.clusterCount == k].clusterCount, gapdf[gapdf.clusterCount == k].gap, s=250, c='r')
 plt.grid(True)
-plt.xlabel('Cluster Count')
+plt.xlabel('cluster Count')
 plt.ylabel('Gap Value')
-plt.title('Gap Values by Cluster Count (K-Means)')
+plt.title('Gap Values by cluster Count (K-Means)')
 plt.show()
 
 # K-means Algorithm

@@ -1,5 +1,10 @@
 # Created by .ignore support plugin (hsz.mobi)
 .gitignore
 .idea/
-Cluster/.idea/
-Cluster/venv/
+cluster/.idea/
+cluster/venv/
+"Cluster/\\home\\jean\\Documentos\\CEA-ML\\Cluster\\Output\\export_dataframe.csv"
+cluster/__pycache__/
+cluster/fuzzycmeans/__pycache__/
+cluster/kmeans/__pycache__/
+cluster/optimalK_methods/__pycache__/
