@@ -7,8 +7,9 @@ from kneed import KneeLocator
 from scipy.spatial.distance import cdist
 from sklearn.metrics import silhouette_score
 import seaborn as sns
+from gap_statistic import OptimalK
 
-from cluster.optimalK_methods.kmeans_gap_statistics import gap_statitics
+from cluster.optimalK_methods.kmeans_gap_statistics import gap_statistics_kmeans
 
 
 x, y = make_blobs(2000, n_features=2, )
@@ -53,7 +54,7 @@ plt.grid(True)
 plt.show()
 
 ################# Gap Statitics Method ###############
-k, gapdf = gap_statitics(x, nrefs=5, maxClusters=15)
+k, gapdf = gap_statistics_kmeans(x, nrefs=5, maxClusters=15)
 print('Optimal k is: ', k)
 plt.plot(gapdf.clusterCount, gapdf.gap, linewidth=3)
 plt.scatter(gapdf[gapdf.clusterCount == k].clusterCount, gapdf[gapdf.clusterCount == k].gap, s=250, c='r')
@@ -78,6 +79,13 @@ plt.scatter(km.cluster_centers_[:, 0], km.cluster_centers_[:, 1], c='r', s=50, a
 plt.grid(True)
 plt.show()
 #######################################################
+
+#GAP 2############
+optimalK = OptimalK(parallel_backend='rust')
+n_clusters = optimalK(x, cluster_array=np.arange(1, 15))
+print('Optimal clusters: ', n_clusters)
+
+####################
 
 
 ########Silhouette Method########################

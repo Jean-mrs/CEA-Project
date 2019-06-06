@@ -4,7 +4,7 @@ import pandas as pd
 import random
 from cluster.kmeans.kmeans import K_Means
 from cluster.optimalK_methods.kmeans_gap_statistics import gap_statistics_kmeans
-
+from gap_statistic import OptimalK
 
 points = 1000
 
@@ -29,6 +29,21 @@ plt.xlabel('cluster Count')
 plt.ylabel('Gap Value')
 plt.title('Gap Values by cluster Count (K-Means)')
 plt.show()
+
+
+#Gap 2
+optimalK = OptimalK(parallel_backend='rust')
+n_clusters = optimalK(X, cluster_array=[1,2,3,4,5])
+print('Optimal clusters: ', n_clusters)
+plt.plot(optimalK.gap_df.n_clusters, optimalK.gap_df.gap_value, linewidth=3)
+plt.scatter(optimalK.gap_df[optimalK.gap_df.n_clusters == n_clusters].n_clusters,
+            optimalK.gap_df[optimalK.gap_df.n_clusters == n_clusters].gap_value, s=250, c='r')
+plt.grid(True)
+plt.xlabel('Cluster Count')
+plt.ylabel('Gap Value')
+plt.title('Gap Values by Cluster Count')
+plt.show()
+#
 
 # K-means Algorithm
 km = K_Means(k)
