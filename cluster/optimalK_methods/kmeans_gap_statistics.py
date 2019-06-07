@@ -12,6 +12,11 @@ def gap_statistics_kmeans(data, nrefs=3, maxClusters=15):
         maxClusters: Maximum number of clusters to test for
     Returns: (gaps, optimalK)
     """
+    skd = np.zeros((len(range(1, maxClusters))))
+    Wkbs = np.zeros((len(range(1, maxClusters))))
+    Wks = np.zeros((len(range(1, maxClusters))))
+    BWkbs = np.zeros((len(range(1, nrefs))))
+
     gaps = np.zeros((len(range(1, maxClusters)),))
     resultsdf = pd.DataFrame({'clusterCount': [], 'gap': []})
     for gap_index, k in enumerate(range(1, maxClusters)):
@@ -31,11 +36,19 @@ def gap_statistics_kmeans(data, nrefs=3, maxClusters=15):
             refDisp = km.inertia_
             refDisps[i] = refDisp
 
+            #New
+            BWkbs[i] = np.log(km.inertia_)
+
         # Fit cluster to original data and create dispersion
         km = KMeans(k)
         km.fit(data)
 
         origDisp = km.inertia_
+
+        #New
+        Wks[gap_index] = np.log(km.inertia_)
+        Wkbs[gap_index] = sum(BWkbs) / nrefs
+        skd[gap_index] = np.sqrt(sum((BWkbs - Wkbs[gap_index]) ** 2) / nrefs)
 
         # Calculate gap statistic
         gap = np.log(np.mean(refDisps)) - np.log(origDisp)
@@ -45,6 +58,11 @@ def gap_statistics_kmeans(data, nrefs=3, maxClusters=15):
 
         resultsdf = resultsdf.append({'clusterCount': k, 'gap': gap}, ignore_index=True)
 
-    return (gaps.argmax() + 1,
+    sk = skd * np.sqrt(1 + 1 / nrefs)
+
+    for gape, k in enumerate(gaps):
+        a = gape[k] - gape[k+1] - sk[k+1]
+
+    return (gaps.argmax() + 1, sk,
             resultsdf)  # Plus 1 because index of 0 means 1 cluster is optimal, index 2 = 3 clusters are optimal
 
