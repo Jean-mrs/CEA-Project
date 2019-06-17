@@ -10,12 +10,13 @@ def gap_statistic(X):
     Wks = zeros(len(ks))
     Wkbs = zeros(len(ks))
     sk = zeros(len(ks))
+    BWkbs = zeros(B)
+
     for indk, k in enumerate(ks):
         mu, clusters = find_centers(X,k)
         Wks[indk] = np.log(Wk(mu, clusters))
         # Create B reference datasets
         B = 10
-        BWkbs = zeros(B)
         for i in range(B):
             Xb = []
             for n in range(len(X)):
