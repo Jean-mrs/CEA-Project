@@ -11,15 +11,15 @@ from cluster.optimalK_methods.fuzzy_gap_statistics import gap_statistics_fuzzy
 from sklearn.datasets.samples_generator import make_blobs
 
 # Data Setup
-points = 50
+points = 100
 axis_range = 10000
-X, y = make_blobs(750, n_features=2, centers=15)
+#X, y = make_blobs(750, n_features=2, centers=15)
 
 #os.mkdir("/home/jean/Resultados")
 for w in range(1):
     x = [random.randint(1, axis_range) for j in range(points)]
     y = [random.randint(1, axis_range) for i in range(points)]
-    #X = np.array(list(list(x) for x in zip(x, y)))
+    X = np.array(list(list(x) for x in zip(x, y)))
     X_df = pd.DataFrame(X)
     fig1 = plt.figure()
     plt.scatter(X[:, 0], X[:, 1], s=10)

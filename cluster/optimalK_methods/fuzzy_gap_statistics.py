@@ -80,12 +80,12 @@ def gap_statistics_fuzzy(data, nrefs=3, maxClusters=15):
     iter_points = [x[0]+1 for x in sorted([y for y in enumerate(gaps)], key=lambda x: x[1], reverse=True)[:3]]
 
     #iter_points_sk = [x[0]+1 for x in sorted([y for y in enumerate(gaps)], key=lambda x: x[0], reverse=True)]
-    if gaps_sks.argmax() == 0:
-        gaps_sks.de
-    if gaps_sks.argmax() == 1:
-        ga.pop(1)
+    if gaps_sks.argmax() <= 1:
+        ga = list(gaps_sks)
+        ga.pop(0)
+        gaps_sks = np.array(ga)
 
-    return iter_points, ga.argmax() + 1, resultsdf, Fpc, gp, best
+    return iter_points, gaps_sks.argmax() + 1, resultsdf, Fpc, gp, best
 
     #return (gaps.argmax() + 1,
      #       resultsdf)  # Plus 1 because index of 0 means 1 cluster is optimal, index 2 = 3 clusters are optimal
