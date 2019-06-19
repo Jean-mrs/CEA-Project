@@ -13,13 +13,13 @@ from sklearn.datasets.samples_generator import make_blobs
 # Data Setup
 points = 100
 axis_range = 10000
-#X, y = make_blobs(750, n_features=2, centers=15)
+X, y = make_blobs(750, n_features=2, centers=10)
 
 #os.mkdir("/home/jean/Resultados")
 for w in range(1):
     x = [random.randint(1, axis_range) for j in range(points)]
     y = [random.randint(1, axis_range) for i in range(points)]
-    X = np.array(list(list(x) for x in zip(x, y)))
+    #X = np.array(list(list(x) for x in zip(x, y)))
     X_df = pd.DataFrame(X)
     fig1 = plt.figure()
     plt.scatter(X[:, 0], X[:, 1], s=10)
@@ -74,7 +74,7 @@ for w in range(1):
     # c, gapdfs0, fpc0, gapsk5 = gap_statistics_fuzzy(X, nrefs=300, maxClusters=30)
     # print(c)
 
-    c, ck, gapdfs1, fpc1, gapsk6, best = gap_statistics_fuzzy(X, nrefs=500, maxClusters=30)
+    c, ck, gapdfs1, gapsk6, best = gap_statistics_fuzzy(X, nrefs=500, maxClusters=30)
     print(c)
     print(gapdfs1)
     print(gapsk6)
@@ -96,7 +96,7 @@ for w in range(1):
     print('Optimal C is: ', ck)
     fig2 = plt.figure()
     plt.plot(gapdfs1.clusterCount, gapdfs1.gap, linewidth=3)
-    plt.scatter(gapdfs1[gapdfs1.clusterCount == ck].clusterCount, gapdfs1[gapdfs1.clusterCount == ck].gap, s=250, c='r')
+    plt.scatter(gapdfs1[gapdfs1.clusterCount == ck[2]].clusterCount, gapdfs1[gapdfs1.clusterCount == ck[2]].gap, s=250, c='r')
     plt.grid(True)
     plt.xlabel('cluster Count')
     plt.ylabel('Gap Value')
@@ -112,7 +112,7 @@ for w in range(1):
     plt.savefig("/home/jean/Documentos/CEA-ML/cluster/Output/Gap_Final_Values:" + str(axis_range) + "_Best" + '_Sim' + str(w))
     #plt.savefig("/home/jean/Resultados/Gap_Final_Values:" + str(axis_range) + "_Best" + str(i) + '_Sim' + str(w))
 
-    cntr, u, u0, d, jm, p, fpc = cmeans(data=alldata, c=ck, m=2, error=0.005, maxiter=1000, init=None)
+    cntr, u, u0, d, jm, p, fpc = cmeans(data=alldata, c=ck[2], m=2, error=0.005, maxiter=1000, init=None)
     print("Euclidian Distance Matrix: ")
     print(pd.DataFrame(d))
     print("\n")
