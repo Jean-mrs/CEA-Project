@@ -13,6 +13,7 @@ def gap_statistics_kmeans(data, nrefs=3, maxClusters=15):
     Returns: (gaps, optimalK)
     """
     skd = np.zeros(len(range(1, maxClusters)))
+    sk = np.zeros(len(range(0, maxClusters)))
     Wkbs = np.zeros(len(range(1, maxClusters)))
     Wks = np.zeros(len(range(1, maxClusters)))
     BWkbs = np.zeros(len(range(0, nrefs)))
@@ -34,8 +35,8 @@ def gap_statistics_kmeans(data, nrefs=3, maxClusters=15):
             km = KMeans(k)
             km.fit(randomReference)
 
-            refDisp = km.inertia_
-            refDisps[i] = refDisp
+            # refDisp = km.inertia_
+            # refDisps[i] = refDisp
 
             #New
             BWkbs[i] = np.log(km.inertia_)
@@ -49,18 +50,18 @@ def gap_statistics_kmeans(data, nrefs=3, maxClusters=15):
         #New
         Wks[gap_index] = np.log(km.inertia_)
         Wkbs[gap_index] = sum(BWkbs) / nrefs
-        skd[gap_index] = np.sqrt(sum((BWkbs - Wkbs[gap_index]) ** 2) / nrefs)
 
         # Calculate gap statistic
-        gap = np.log(np.mean(refDisps)) - np.log(origDisp)
+        gap = sum(BWkbs)/nrefs -Wks[gap_index]
 
         # Assign this loop's gap statistic to gaps
         gaps[gap_index] = gap
 
         resultsdf = resultsdf.append({'clusterCount': k, 'gap': gap}, ignore_index=True)
 
-    #New
-    sk = skd * np.sqrt(1 + 1 / nrefs)
+        #New
+        skd[gap_index] = np.sqrt((sum((BWkbs - Wkbs[gap_index]) ** 2)) / nrefs)
+        sk[gap_index] = skd[gap_index] * np.sqrt(1 + 1 / nrefs)
     for k, gape in enumerate(gaps):
         if not k == len(gaps) - 1:
             gap_sk = gaps[k] - gaps[k + 1] - sk[k + 1]
