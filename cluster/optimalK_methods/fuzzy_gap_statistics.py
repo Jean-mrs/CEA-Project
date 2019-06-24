@@ -21,7 +21,6 @@ def gap_statistics_fuzzy(data, nrefs=3, maxClusters=15):
     gp = pd.DataFrame({'clusterCount': [], 'Gap_sk': []})
 
     gaps = np.zeros((len(range(1, maxClusters)),))
-    #best = np.zeros((len(range(1, maxClusters)),))
     resultsdf = pd.DataFrame({'clusterCount': [], 'gap': []})
 
     for gap_index, c in enumerate(range(1, maxClusters)):
@@ -34,12 +33,14 @@ def gap_statistics_fuzzy(data, nrefs=3, maxClusters=15):
             # Fit to it
             cntr, u, u0, d, jm, p, fpc = cmeans(data=randomReference, c=c, m=2, error=0.005, maxiter=1000)
 
+            # Holder for reference dispersion results
             BWkbs[i] = np.log(jm[len(jm)-1])
             #BWkbs[i] = np.log(np.mean(jm))
 
         # Fit cluster to original data and create dispersion
         cntr, u, u0, d, jm, p, fpc = cmeans(data=data, c=c, m=2, error=0.005, maxiter=1000)
 
+        # Holder for original dispersion results
         Wks[gap_index] = np.log(jm[len(jm)-1])
         #Wks[gap_index] = np.log(np.mean(jm))
 
@@ -49,6 +50,7 @@ def gap_statistics_fuzzy(data, nrefs=3, maxClusters=15):
         # Assign this loop's gap statistic to gaps
         gaps[gap_index] = gap
 
+        # Assign gap values and cluster count to plot curve graph
         resultsdf = resultsdf.append({'clusterCount': c, 'gap': gap}, ignore_index=True)
 
         # Compute Standard Deviation
@@ -76,10 +78,14 @@ def gap_statistics_fuzzy(data, nrefs=3, maxClusters=15):
             gaps_sks[k] = -20
             #else:
          #   gaps_sks[k] = -1000
+
+        # Assign new gap values calculated by simulation error and cluster count to plot bar graph
         gp = gp.append({'clusterCount': k, 'Gap_sk': gaps_sks[k]}, ignore_index=True)
 
+    # Assign best cluster numbers by gap values
     iter_points = [x[0]+1 for x in sorted([y for y in enumerate(gaps)], key=lambda x: x[1], reverse=True)[:3]]
 
+    # Assign best cluster numbers by gap values calculated with simulation error
     iter_points_sk = [x[0]+1 for x in sorted([y for y in enumerate(gaps_sks)], key=lambda x: x[1], reverse=True)[:3]]
 
     # if gaps_sks.argmax() <= 1:
