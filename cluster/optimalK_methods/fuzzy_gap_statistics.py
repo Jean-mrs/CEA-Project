@@ -60,27 +60,15 @@ def gap_statistics_fuzzy(data, nrefs=3, maxClusters=15):
         # Compute the Simulation Error
         sError[gap_index] = sdk[gap_index] * np.sqrt(1 + 1 / nrefs)
 
-    # for k, gape in enumerate(gaps):
-    #     if not k == len(gaps) - 1:
-    #         if gaps[k] >= gaps[k + 1] - sError[k + 1]:
-    #             print(str(gaps[k]) + ' >= ' + str(gaps[k + 1]) + ' - ' + str(sError[k + 1]))
-    #             best[k] = gaps[k]
-    #     else:
-    #         best[k] = -20
-    #     gp = gp.append({'clusterCount': k, 'Gap_sk': best[k]}, ignore_index=True)
-
     for k, gape in enumerate(range(1, maxClusters)):
         if not k == len(gaps) - 1:
-        #if not k == maxClusters - 1 and not k == maxClusters - 2:
             if gaps[k] >= gaps[k + 1] - sError[k + 1]:
                 gaps_sks[k] = gaps[k] - gaps[k + 1] - sError[k + 1]
         else:
             gaps_sks[k] = -20
-            #else:
-         #   gaps_sks[k] = -1000
 
         # Assign new gap values calculated by simulation error and cluster count to plot bar graph
-        gp = gp.append({'clusterCount': k, 'Gap_sk': gaps_sks[k]}, ignore_index=True)
+        gp = gp.append({'clusterCount': k+1, 'Gap_sk': gaps_sks[k]}, ignore_index=True)
 
     # Assign best cluster numbers by gap values
     iter_points = [x[0]+1 for x in sorted([y for y in enumerate(gaps)], key=lambda x: x[1], reverse=True)[:3]]
@@ -88,10 +76,15 @@ def gap_statistics_fuzzy(data, nrefs=3, maxClusters=15):
     # Assign best cluster numbers by gap values calculated with simulation error
     iter_points_sk = [x[0]+1 for x in sorted([y for y in enumerate(gaps_sks)], key=lambda x: x[1], reverse=True)[:3]]
 
-    # if gaps_sks.argmax() <= 1:
-    #     ga = list(gaps_sks)
-    #     ga.pop(0)
-    #     gaps_sks = np.array(ga)
+    a = list(filter(lambda g: g in iter_points, iter_points_sk))
+    if len(a) is not 0:
+        if not min(a) is 1:
+            k = min(a)
+        else:
+            a.remove(1)
+            k = min(a)
+    else:
+        k = min(iter_points_sk)
 
-    return iter_points, iter_points_sk, resultsdf, gp
+    return k, resultsdf, gp
 

@@ -7,11 +7,11 @@ from cluster.optimalK_methods.fuzzy_gap_statistics import gap_statistics_fuzzy
 
 
 # Data Setup
-points = 3000
+points = 1000
 axis_range = 10000
 #X, y = make_blobs(1000, n_features=2, centers=15)
 
-for w in range(3):
+for w in range(30):
     x = [random.randint(1, axis_range) for j in range(points)]
     y = [random.randint(1, axis_range) for i in range(points)]
     X = np.array(list(list(x) for x in zip(x, y)))
@@ -26,21 +26,10 @@ for w in range(3):
     alldata = np.vstack((xpts,  ypts))
 
     # Fuzzy Gap Statistics
-    c, ck, gapdfs1, gapsk6= gap_statistics_fuzzy(X, nrefs=500, maxClusters=30)
-    print(c)
-    print(ck)
+    k, gapdfs1, gapsk6= gap_statistics_fuzzy(X, nrefs=500, maxClusters=30)
+    print(k)
     print(gapdfs1)
     print(gapsk6)
-    a = list(filter(lambda g: g in c, ck))
-    print(a)
-    if len(a) is not 0:
-        if not min(a) is 1:
-            k = min(a)
-        else:
-            a.remove(1)
-            k = min(a)
-    else:
-        k = min(ck)
 
     #print(k)
 
