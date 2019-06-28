@@ -310,10 +310,31 @@ def _cmeans_predict0(test_data, cntr, u_old, c, m, metric):
     return u, jm, d
 
 
-def range_limit(d, max=2500):
+def range_limit(d, max=2000):
     df = pd.DataFrame(d)
     for column in df.columns[0:]:
         for item in df[column]:
             if item >= max:
                 df.replace(item, 10000, True)
     return np.array(df)
+
+
+def points_limit(data, k, maxPoints=100):
+    desorganized = True
+    while desorganized:
+        cntr, u, u0, d, jm, p, fpc = cmeans(data=data, c=k, m=2, error=0.005, maxiter=1000, init=None)
+        df = pd.DataFrame(u)
+        a = 0
+        for index, row in df.iterrows():
+            aux = []
+            for item in row:
+                if item >= 0.9:
+                    aux.append(item)
+            if len(aux) >= maxPoints:
+                k += 1
+                break
+            else:
+                a += 1
+        if a == k:
+            desorganized = False
+    return k
