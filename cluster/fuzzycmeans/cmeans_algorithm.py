@@ -328,7 +328,7 @@ def points_limit(data, k, maxPoints=100):
         for index, row in df.iterrows():
             aux = []
             for item in row:
-                if item >= 0.9:
+                if item >= 0.6:
                     aux.append(item)
             if len(aux) >= maxPoints:
                 k += 1
