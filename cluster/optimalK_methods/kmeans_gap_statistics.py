@@ -17,15 +17,12 @@ def gap_statistics_kmeans(data, nrefs=3, maxClusters=15):
     Wkbs = np.zeros(len(range(1, maxClusters)))
     Wks = np.zeros(len(range(1, maxClusters)))
     BWkbs = np.zeros(len(range(0, nrefs)))
+    gaps_sks = np.zeros((len(range(1, maxClusters))))
     gp = pd.DataFrame({'clusterCount': [], 'Gap_sk': []})
 
     gaps = np.zeros((len(range(1, maxClusters)),))
     resultsdf = pd.DataFrame({'clusterCount': [], 'gap': []})
     for gap_index, k in enumerate(range(1, maxClusters)):
-
-        # Holder for reference dispersion results
-        refDisps = np.zeros(nrefs)
-
         # For n references, generate random sample and perform kmeans getting resulting dispersion of each loop
         for i in range(nrefs):
             # Create new random reference set
@@ -62,14 +59,32 @@ def gap_statistics_kmeans(data, nrefs=3, maxClusters=15):
         #New
         skd[gap_index] = np.sqrt((sum((BWkbs - Wkbs[gap_index]) ** 2)) / nrefs)
         sk[gap_index] = skd[gap_index] * np.sqrt(1 + 1 / nrefs)
-    for k, gape in enumerate(gaps):
-        if not k == len(gaps) - 1:
-            gap_sk = gaps[k] - gaps[k + 1] - sk[k + 1]
-        else:
-            pass
-            #gap_sk = gaps[k] - sk[k]
-        gp = gp.append({'clusterCount': k, 'Gap_sk': gap_sk}, ignore_index=True)
 
-    return (gaps.argmax() + 1, sk,
-            resultsdf, gp)  # Plus 1 because index of 0 means 1 cluster is optimal, index 2 = 3 clusters are optimal
+    for k, gape in enumerate(range(1, maxClusters)):
+        if not k == len(gaps) - 1:
+            if gaps[k] >= gaps[k + 1] - sk[k + 1]:
+                gaps_sks[k] = gaps[k] - gaps[k + 1] - sk[k + 1]
+        else:
+            gaps_sks[k] = -20
+
+        # Assign new gap values calculated by simulation error and cluster count to plot bar graph
+        gp = gp.append({'clusterCount': k + 1, 'Gap_sk': gaps_sks[k]}, ignore_index=True)
+
+        # Assign best cluster numbers by gap values
+    iter_points = [x[0] + 1 for x in sorted([y for y in enumerate(gaps)], key=lambda x: x[1], reverse=True)[:3]]
+
+    # Assign best cluster numbers by gap values calculated with simulation error
+    iter_points_sk = [x[0] + 1 for x in sorted([y for y in enumerate(gaps_sks)], key=lambda x: x[1], reverse=True)[:3]]
+
+    a = list(filter(lambda g: g in iter_points, iter_points_sk))
+    if len(a) is not 0:
+        if not min(a) is 1:
+            k = min(a)
+        else:
+            a.remove(1)
+            k = min(a)
+    else:
+        k = min(iter_points_sk)
+
+    return k, resultsdf, gp
 
