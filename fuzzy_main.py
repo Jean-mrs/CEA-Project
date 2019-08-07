@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import random
 from cluster.fuzzycmeans.cmeans_algorithm import cmeans, points_limit
-from cluster.optimalK_methods.fuzzy_gap_statistics import gap_statistics_fuzzy
+from cluster.optimalC_method.fuzzy_gap_statistics import gap_statistics_fuzzy
 
 
 # Data Setup

@@ -7,4 +7,4 @@ cluster/venv/
 cluster/__pycache__/
 cluster/fuzzycmeans/__pycache__/
 cluster/kmeans/__pycache__/
-cluster/optimalK_methods/__pycache__/
+cluster/optimalC_method/__pycache__/
