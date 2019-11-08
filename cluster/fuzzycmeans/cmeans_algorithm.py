@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from scipy.spatial.distance import cdist
 from cluster.fuzzycmeans.normalize_columns import normalize_columns, normalize_power_columns
+from loraDir import lorasim_simulate
 
 
 def _cmeans0(data, u_old, c, m, metric):
@@ -25,7 +26,6 @@ def _cmeans0(data, u_old, c, m, metric):
     # Calculate cluster centers
     data = data.T
     cntr = um.dot(data) / np.atleast_2d(um.sum(axis=1)).T
-
     d = _distance(data, cntr, metric)
     d = np.fmax(d, np.finfo(np.float64).eps)
     d = range_limit(d)
@@ -180,7 +180,6 @@ def cmeans(data, c, m, error, maxiter, metric='euclidean', init=None, seed=None)
     # Final calculations
     error = np.linalg.norm(u - u2)
     fpc = _fp_coeff(u)
-
     return cntr, u, u0, d, jm, p, fpc
 
 
@@ -317,6 +316,24 @@ def range_limit(d, max=2000):
             if item >= max:
                 df.replace(item, 10000, True)
     return np.array(df)
+
+
+def sensi_limit(data, k, nnodes, avgSendTime=10, experiment=5, simtime=15000):
+    not_signal = True
+    while not_signal:
+        cntr, u, u0, d, jm, p, fpc = cmeans(data=data, c=k, m=2, error=0.005, maxiter=1000, init=None)
+        a = 0
+        for bs_id in range(0, k):
+            rssi = lorasim_simulate(nrNodes=nnodes, data=data, gtwxy=cntr, bs_id=bs_id)
+            for sensitivity in rssi:
+                if sensitivity < -134.50:
+                    k += 1
+                    break
+                else:
+                    a += 1
+        if a == k:
+            not_signal = False
+    return k
 
 
 def points_limit(data, k, maxPoints=100):
