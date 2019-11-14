@@ -52,6 +52,7 @@ import simpy
 import random
 import numpy as np
 import math
+import time
 import sys
 import matplotlib.pyplot as plt
 import os
@@ -256,7 +257,7 @@ class myNode:
             if len(nodes) > 0:
                 for index, n in enumerate(nodes):
                     dist = np.sqrt(((abs(n.x - posx)) ** 2) + ((abs(n.y - posy)) ** 2))
-                    if dist >= 10:
+                    if dist >= 100:
                         found = 1
                         self.x = posx
                         self.y = posy
@@ -475,16 +476,18 @@ GL = 0
 sensi = np.array([sf7, sf8, sf9, sf10, sf11, sf12])
 
 
-def lorasim_simulate( nrNodes, data, gtwxy, bs_id, avgSendTime=10, experiment=5, simtime=360000, full_collision=None):
+def lorasim_simulate( nrNodes, data, gtwxy, bs_id, avgSendTime=10, simtime=360000):
+    print(bs_id)
+    print(gtwxy)
     # get arguments
-    if full_collision is not None:
-        full_colli = full_collision
+    start_time = time.time()
+    # if full_collision is not None:
+    #     full_colli = full_collision
     # print("Nodes:", nrNodes)
     # print("AvgSendTime (exp. distributed):", avgSendTime)
     # print("Experiment: ", experiment)
     # print("Simtime: ", simtime)
     # print("Full Collision: ", full_colli)
-
 
     # if len(sys.argv) >= 5:
     #     nrNodes = int(sys.argv[1])
@@ -503,13 +506,12 @@ def lorasim_simulate( nrNodes, data, gtwxy, bs_id, avgSendTime=10, experiment=5,
     #     print ("experiment 0 and 1 use 1 frequency only")
     #     exit(-1)
 
-
-    if experiment in [0, 1, 4]:
-        minsensi = sensi[5, 2]  # 5th row is SF12, 2nd column is BW125
-    elif experiment == 2:
-        minsensi = -112.0  # no experiments, so value from datasheet
-    elif experiment in [3, 5]:
-        minsensi = np.amin(sensi)  ## Experiment 3 can use any setting, so take minimum
+    # if experiment in [0, 1, 4]:
+    #     minsensi = sensi[5, 2]  # 5th row is SF12, 2nd column is BW125
+    # elif experiment == 2:
+    #     minsensi = -112.0  # no experiments, so value from datasheet
+    # elif experiment in [3, 5]:
+    #     minsensi = np.amin(sensi)  ## Experiment 3 can use any setting, so take minimum
     # Lpl = Ptx - minsensi
     # print ("amin", minsensi, "Lpl", Lpl)
 
@@ -554,20 +556,21 @@ def lorasim_simulate( nrNodes, data, gtwxy, bs_id, avgSendTime=10, experiment=5,
 
 
     # start simulation
-    env.run(until=1200000)
+    # env.run(until=500000000)
+    env.run(until=env.timeout(5))
 
     # # print stats and save into file
     # print ("nrCollisions ", nrCollisions)
 
     # compute energy
     # Transmit consumption in mA from -2 to +17 dBm
-    TX = [22, 22, 22, 23,  # RFO/PA0: -2..1
-          24, 24, 24, 25, 25, 25, 25, 26, 31, 32, 34, 35, 44,  # PA_BOOST/PA1: 2..14
-          82, 85, 90,  # PA_BOOST/PA1: 15..17
-          105, 115, 125]  # PA_BOOST/PA1+PA2: 18..20
+    # TX = [22, 22, 22, 23,  # RFO/PA0: -2..1
+    #       24, 24, 24, 25, 25, 25, 25, 26, 31, 32, 34, 35, 44,  # PA_BOOST/PA1: 2..14
+    #       82, 85, 90,  # PA_BOOST/PA1: 15..17
+    #       105, 115, 125]  # PA_BOOST/PA1+PA2: 18..20
     # mA = 90    # current draw for TX = 17 dBm
-    V = 3.0  # voltage XXX
-    sent = sum(n.sent for n in nodes)
+    #V = 3.0  # voltage XXX
+    #sent = sum(n.sent for n in nodes)
     #energy = sum(node.packet.rectime * TX[int(node.packet.txpow) + 2] * V * node.sent for node in nodes) / 1e6
 
     # #print "energy (in J): ", energy
@@ -615,7 +618,6 @@ def lorasim_simulate( nrNodes, data, gtwxy, bs_id, avgSendTime=10, experiment=5,
     # rssifile.close()
 
     rssilist = [n.packet.rssi for n in nodes]
-    print(rssilist)
     #
     # df_nodes = pd.DataFrame()
     # df_nodes['node_id'] = nod_id
@@ -630,3 +632,4 @@ def lorasim_simulate( nrNodes, data, gtwxy, bs_id, avgSendTime=10, experiment=5,
     #     bfile.write("{} {} {}\n".format(bsx, bsy, 0))
 
     return rssilist
+

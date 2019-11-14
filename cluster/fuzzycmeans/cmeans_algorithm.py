@@ -3,12 +3,14 @@ cmeans_algorithm.py : Fuzzy C-means clustering algorithm.
 """
 import numpy as np
 import pandas as pd
+import time
+import sys
 from scipy.spatial.distance import cdist
 from cluster.fuzzycmeans.normalize_columns import normalize_columns, normalize_power_columns
 from loraDir import lorasim_simulate
 
 
-def _cmeans0(data, u_old, c, m, metric):
+def _cmeans0(data, u_old, m, metric, k, nnodes, bstation=None, testsensi=False):
     """
     Single step in generic fuzzy c-means clustering algorithm.
 
@@ -17,6 +19,7 @@ def _cmeans0(data, u_old, c, m, metric):
 
     Parameters inherited from cmeans()
     """
+    #sys.setrecursionlimit(15000)
     # Normalizing, then eliminating any potential zero values.
     u_old = normalize_columns(u_old)
     u_old = np.fmax(u_old, np.finfo(np.float64).eps)
@@ -28,7 +31,8 @@ def _cmeans0(data, u_old, c, m, metric):
     cntr = um.dot(data) / np.atleast_2d(um.sum(axis=1)).T
     d = _distance(data, cntr, metric)
     d = np.fmax(d, np.finfo(np.float64).eps)
-    d = range_limit(d)
+    if testsensi:
+        d = sensi_limit(d, data, k, nnodes, bstation, avgSendTime=10, experiment=5, simtime=15000)
 
     jm = (um * d ** 2).sum()
 
@@ -84,7 +88,7 @@ def _fp_coeff(u):
     return np.trace(u.dot(u.T)) / float(n)
 
 
-def cmeans(data, c, m, error, maxiter, metric='euclidean', init=None, seed=None):
+def cmeans(data, c, m, error, maxiter, nnodes, bstation=None, testsensi=False, metric='euclidean', init=None, seed=None):
     """
     Fuzzy c-means clustering algorithm [1].
 
@@ -169,7 +173,7 @@ def cmeans(data, c, m, error, maxiter, metric='euclidean', init=None, seed=None)
     # Main cmeans loop
     while p < maxiter - 1:
         u2 = u.copy()
-        [cntr, u, Jjm, d] = _cmeans0(data, u2, c, m, metric)
+        [cntr, u, Jjm, d] = _cmeans0(data, u2, m, metric, c, nnodes, bstation, testsensi)
         jm = np.hstack((jm, Jjm))
         p += 1
 
@@ -318,28 +322,28 @@ def range_limit(d, max=2000):
     return np.array(df)
 
 
-def sensi_limit(data, k, nnodes, avgSendTime=10, experiment=5, simtime=15000):
-    not_signal = True
-    while not_signal:
-        cntr, u, u0, d, jm, p, fpc = cmeans(data=data, c=k, m=2, error=0.005, maxiter=1000, init=None)
-        a = 0
-        for bs_id in range(0, k):
-            rssi = lorasim_simulate(nrNodes=nnodes, data=data, gtwxy=cntr, bs_id=bs_id)
-            for sensitivity in rssi:
-                if sensitivity < -134.50:
-                    k += 1
-                    break
-                else:
-                    a += 1
-        if a == k:
-            not_signal = False
-    return k
+def sensi_limit(d, data, k, nnodes, cntr, avgSendTime=10, experiment=5, simtime=15000):
+    distances = pd.DataFrame(d)
+    sensibility = pd.DataFrame()
+    print(sensibility)
+    for bs_id in range(0, k):
+        rssi = pd.DataFrame(lorasim_simulate(nrNodes=nnodes, data=data, gtwxy=cntr, bs_id=bs_id))
+        print(rssi)
+        sensibility = pd.concat([sensibility, rssi], axis=1, ignore_index=True)
+    print(sensibility)
+    #print(sensibility)
+    # for i in range(0, len(distances.index)):
+    #     for j in range(0, len(distances.columns)):
+    #         if sensibility.iat[i, j] < -134.50:
+    #             distances.iat[i, j] = 10000
+    # print(sensibility)
+    return np.array(distances)
 
 
-def points_limit(data, k, maxPoints=100):
+def points_limit(data, k, nnodes, maxPoints=100):
     desorganized = True
     while desorganized:
-        cntr, u, u0, d, jm, p, fpc = cmeans(data=data, c=k, m=2, error=0.005, maxiter=1000, init=None)
+        cntr, u, u0, d, jm, p, fpc = cmeans(data=data, c=k, m=2, error=0.005, maxiter=1000, init=None, nnodes=nnodes)
         df = pd.DataFrame(u)
         a = 0
         for index, row in df.iterrows():
