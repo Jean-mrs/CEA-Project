@@ -3,7 +3,7 @@ import pandas as pd
 from cluster.fuzzycmeans.cmeans_algorithm import cmeans
 
 
-def gap_statistics_fuzzy(data, nrefs=3, maxClusters=15):
+def gap_statistics_fuzzy(data, nnodes, nrefs=3, maxClusters=15):
     """
     Calculates Fuzzy C-Means optimal C using Gap Statistic from Sentelle, Hong, Georgiopoulos, Anagnostopoulos
     Params:
@@ -31,14 +31,20 @@ def gap_statistics_fuzzy(data, nrefs=3, maxClusters=15):
             randomReference = np.random.random_sample(size=data.shape)
 
             # Fit to it
-            cntr, u, u0, d, jm, p, fpc = cmeans(data=randomReference, c=c, m=2, error=0.005, maxiter=1000)
+            cntr1, u1, u01, d1, jm, p1, fpc1 = cmeans(data=randomReference, c=c, m=2, error=0.005, maxiter=1000,
+                                                       nnodes=nnodes)
+            cntr, u, u0, d, jm, p, fpc = cmeans(data=randomReference.T, c=c, m=2, error=0.005, maxiter=1000, nnodes=nnodes,
+                                                bstation=cntr1, testsensi=True)
+
 
             # Holder for reference dispersion results
             BWkbs[i] = np.log(jm[len(jm)-1])
             #BWkbs[i] = np.log(np.mean(jm))
 
         # Fit cluster to original data and create dispersion
-        cntr, u, u0, d, jm, p, fpc = cmeans(data=data, c=c, m=2, error=0.005, maxiter=1000)
+        cntr1, u1, u01, d1, jm1, p1, fpc1 = cmeans(data=data, c=c, m=2, error=0.005, maxiter=1000, nnodes=nnodes)
+        cntr, u, u0, d, jm, p, fpc = cmeans(data=data.T, c=c, m=2, error=0.005, maxiter=1000, nnodes=nnodes,
+                                            bstation=cntr1, testsensi=True)
 
         # Holder for original dispersion results
         Wks[gap_index] = np.log(jm[len(jm)-1])

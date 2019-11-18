@@ -325,18 +325,15 @@ def range_limit(d, max=2000):
 def sensi_limit(d, data, k, nnodes, cntr, avgSendTime=10, experiment=5, simtime=15000):
     distances = pd.DataFrame(d)
     sensibility = pd.DataFrame()
-    print(sensibility)
     for bs_id in range(0, k):
         rssi = pd.DataFrame(lorasim_simulate(nrNodes=nnodes, data=data, gtwxy=cntr, bs_id=bs_id))
-        print(rssi)
         sensibility = pd.concat([sensibility, rssi], axis=1, ignore_index=True)
+    sensibility = sensibility.T
+    for i in range(0, len(distances.index)):
+        for j in range(0, len(distances.columns)):
+            if sensibility.iat[i, j] < -134.50:
+                distances.iat[i, j] = 10000
     print(sensibility)
-    #print(sensibility)
-    # for i in range(0, len(distances.index)):
-    #     for j in range(0, len(distances.columns)):
-    #         if sensibility.iat[i, j] < -134.50:
-    #             distances.iat[i, j] = 10000
-    # print(sensibility)
     return np.array(distances)
 
 

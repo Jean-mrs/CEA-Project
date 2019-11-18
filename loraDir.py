@@ -223,7 +223,7 @@ def airtime(sf, cr, pl, bw):
 
     Tsym = (2.0 ** sf) / bw
     Tpream = (Npream + 4.25) * Tsym
-    print ("sf", sf, " cr", cr, "pl", pl, "bw", bw)
+    #print ("sf", sf, " cr", cr, "pl", pl, "bw", bw)
     payloadSymbNB = 8 + max(math.ceil((8.0 * pl - 4.0 * sf + 28 + 16 - 20 * H) / (4.0 * (sf - 2 * DE))) * (cr + 4), 0)
     Tpayload = payloadSymbNB * Tsym
     return Tpream + Tpayload
@@ -267,12 +267,12 @@ class myNode:
                             print ("could not place new node, giving up")
                             exit(-1)
             else:
-                print ("first node")
+                #print ("first node")
                 self.x = posx
                 self.y = posy
                 found = 1
         self.dist = np.sqrt((self.x - bsx) * (self.x - bsx) + (self.y - bsy) * (self.y - bsy))
-        print('node %d' % nodeid, "x", self.x, "y", self.y, "dist: ", self.dist)
+        #print('node %d' % nodeid, "x", self.x, "y", self.y, "dist: ", self.dist)
 
         self.packet = myPacket(self.nodeid, packetlen, self.dist)
         self.sent = 0
@@ -324,7 +324,7 @@ class myPacket:
 
         # log-shadow
         Lpl = Lpld0 + 10 * gamma * math.log10(distance / d0)
-        print ("Lpl:", Lpl)
+        #print ("Lpl:", Lpl)
         Prx = self.txpow - GL - Lpl
 
         if (experiment == 3) or (experiment == 5):
@@ -332,7 +332,7 @@ class myPacket:
             minsf = 0
             minbw = 0
 
-            print ("Prx:", Prx)
+            #print ("Prx:", Prx)
 
             for i in range(0, 6):
                 for j in range(1, 4):
@@ -353,7 +353,7 @@ class myPacket:
             if minairtime == 9999:
                 print ("does not reach base station")
                 #exit(-1)
-            print ("best sf:", minsf, " best bw: ", minbw, "best airtime:", minairtime)
+            #print ("best sf:", minsf, " best bw: ", minbw, "best airtime:", minairtime)
             self.rectime = minairtime
             self.sf = minsf
             self.bw = minbw
@@ -363,7 +363,7 @@ class myPacket:
                 # reduce the txpower if there's room left
                 self.txpow = max(2, self.txpow - math.floor(Prx - minsensi))
                 Prx = self.txpow - GL - Lpl
-                print ('minsesi {} best txpow {}'.format(minsensi, self.txpow))
+                #print ('minsesi {} best txpow {}'.format(minsensi, self.txpow))
 
         # transmission range, needs update XXX
         # self.transRange = 150
@@ -381,10 +381,10 @@ class myPacket:
         else:
             self.freq = 915000000
 
-        print ("frequency", self.freq, "symTime ", self.symTime)
-        print ("bw", self.bw, "sf", self.sf, "cr", self.cr, "rssi", self.rssi)
+        #print ("frequency", self.freq, "symTime ", self.symTime)
+        #print ("bw", self.bw, "sf", self.sf, "cr", self.cr, "rssi", self.rssi)
         self.rectime = airtime(self.sf, self.cr, self.pl, self.bw)
-        print ("rectime node ", self.nodeid, "  ", self.rectime)
+        #print ("rectime node ", self.nodeid, "  ", self.rectime)
         # denote if packet is collided
         self.collided = 0
         self.processed = 0
@@ -477,8 +477,10 @@ sensi = np.array([sf7, sf8, sf9, sf10, sf11, sf12])
 
 
 def lorasim_simulate( nrNodes, data, gtwxy, bs_id, avgSendTime=10, simtime=360000):
-    print(bs_id)
-    print(gtwxy)
+    Rnd = random.seed(12345)
+    nodes = []
+    packetsAtBS = []
+    env = simpy.Environment()
     # get arguments
     start_time = time.time()
     # if full_collision is not None:
@@ -618,6 +620,7 @@ def lorasim_simulate( nrNodes, data, gtwxy, bs_id, avgSendTime=10, simtime=36000
     # rssifile.close()
 
     rssilist = [n.packet.rssi for n in nodes]
+    #
     #
     # df_nodes = pd.DataFrame()
     # df_nodes['node_id'] = nod_id
