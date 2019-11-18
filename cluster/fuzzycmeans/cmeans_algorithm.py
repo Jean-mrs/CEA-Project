@@ -31,6 +31,8 @@ def _cmeans0(data, u_old, m, metric, k, nnodes, bstation=None, testsensi=False):
     cntr = um.dot(data) / np.atleast_2d(um.sum(axis=1)).T
     d = _distance(data, cntr, metric)
     d = np.fmax(d, np.finfo(np.float64).eps)
+
+    # Calculate range limit based on Rssi
     if testsensi:
         d = sensi_limit(d, data, k, nnodes, bstation, avgSendTime=10, experiment=5, simtime=15000)
 

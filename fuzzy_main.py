@@ -30,7 +30,7 @@ for w in range(1):
 
     # Fuzzy Gap Statistics
     k, gapdfs1, gapsk6 = gap_statistics_fuzzy(X, nrefs=1, maxClusters=30, nnodes=points)
-    print('Old C: ', k)
+    # print('Old C: ', k)
     #c = sensi_limit(X, k, points)
     #c = points_limit(data=alldata, k=k, maxPoints=70)
     print('New C: ', k)
