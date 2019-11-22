@@ -31,23 +31,23 @@ def gap_statistics_fuzzy(data, nnodes, nrefs=3, maxClusters=15):
             randomReference = np.random.random_sample(size=data.shape)
 
             # Fit to it
-            cntr1, u1, u01, d1, jm, p1, fpc1 = cmeans(data=randomReference, c=c, m=2, error=0.005, maxiter=1000,
+            cntr1, u1, u01, d1, jm1, p1, fpc1 = cmeans(data=randomReference, c=c, m=2, error=0.005, maxiter=1000,
                                                        nnodes=nnodes)
-            cntr, u, u0, d, jm, p, fpc = cmeans(data=randomReference.T, c=c, m=2, error=0.005, maxiter=1000, nnodes=nnodes,
+            cntr4, u4, u04, d4, jm4, p4, fpc4 = cmeans(data=randomReference.T, c=c, m=2, error=0.005, maxiter=1000, nnodes=nnodes,
                                                 bstation=cntr1, testsensi=True)
 
 
             # Holder for reference dispersion results
-            BWkbs[i] = np.log(jm[len(jm)-1])
+            BWkbs[i] = np.log(jm4[len(jm4)-1])
             #BWkbs[i] = np.log(np.mean(jm))
 
         # Fit cluster to original data and create dispersion
-        cntr1, u1, u01, d1, jm1, p1, fpc1 = cmeans(data=data, c=c, m=2, error=0.005, maxiter=1000, nnodes=nnodes)
-        cntr, u, u0, d, jm, p, fpc = cmeans(data=data.T, c=c, m=2, error=0.005, maxiter=1000, nnodes=nnodes,
-                                            bstation=cntr1, testsensi=True)
+        cntr2, u2, u02, d2, jm2, p2, fpc2 = cmeans(data=data, c=c, m=2, error=0.005, maxiter=1000, nnodes=nnodes)
+        cntr3, u3, u03, d3, jm3, p3, fpc3 = cmeans(data=data.T, c=c, m=2, error=0.005, maxiter=1000, nnodes=nnodes,
+                                            bstation=cntr2, testsensi=True)
 
         # Holder for original dispersion results
-        Wks[gap_index] = np.log(jm[len(jm)-1])
+        Wks[gap_index] = np.log(jm3[len(jm3)-1])
         #Wks[gap_index] = np.log(np.mean(jm))
 
         # Calculate gap statistic

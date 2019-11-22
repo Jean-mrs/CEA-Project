@@ -56,9 +56,9 @@ for w in range(1):
     #plt.savefig("/home/jean/public_html/Sim_2000x33_Limit70/Gap_Final_Values:" + str(points) + "_Best" + '_Sim' + str(w))
 
     # Fuzzy C-Means Algorithm
-    cntr, u, u0, d, jm, p, fpc = cmeans(data=alldata, c=25, m=2, error=0.005, maxiter=2, init=None, nnodes=points)
+    cntr, u, u0, d, jm, p, fpc = cmeans(data=alldata, c=k, m=2, error=0.005, maxiter=2, init=None, nnodes=points)
 
-    cntr1, u1, u01, d1, jm1, p1, fpc1 = cmeans(data=alldata, c=25, m=2, error=0.005, maxiter=2, init=None, nnodes=points,testsensi=True, bstation=cntr)
+    cntr1, u1, u01, d1, jm1, p1, fpc1 = cmeans(data=alldata, c=k, m=2, error=0.005, maxiter=2, init=None, nnodes=points,testsensi=True, bstation=cntr)
     print(pd.DataFrame(d1))
     #print("Euclidian Distance Matrix: ")
     #pprint(cntr)
