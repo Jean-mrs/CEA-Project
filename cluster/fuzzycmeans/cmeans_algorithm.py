@@ -34,8 +34,9 @@ def _cmeans0(data, u_old, m, metric, k, nnodes, bstation=None, testsensi=False):
 
     # Calculate range limit based on Rssi
     if testsensi:
-        d = sensi_limit(d, data, k, nnodes, bstation, avgSendTime=10, experiment=5, simtime=15000)
-
+        #print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+        d = sensi_limit(d, data, k, nnodes, bstation)
+    #print(d)
     jm = (um * d ** 2).sum()
 
     u = normalize_power_columns(d, - 2. / (m - 1))
@@ -324,7 +325,7 @@ def range_limit(d, max=2000):
     return np.array(df)
 
 
-def sensi_limit(d, data, k, nnodes, cntr, avgSendTime=10, experiment=5, simtime=15000):
+def sensi_limit(d, data, k, nnodes, cntr):
     distances = pd.DataFrame(d)
     sensibility = pd.DataFrame()
     for bs_id in range(0, k):
@@ -333,7 +334,7 @@ def sensi_limit(d, data, k, nnodes, cntr, avgSendTime=10, experiment=5, simtime=
     sensibility = sensibility.T
     for i in range(0, len(distances.index)):
         for j in range(0, len(distances.columns)):
-            if sensibility.iat[i, j] < -134.50:
+            if sensibility.iat[i, j] < -137:
                 distances.iat[i, j] = 10000
     print(sensibility)
     return np.array(distances)

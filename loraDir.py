@@ -73,16 +73,16 @@ full_collision = False
 
 
 # this is an array with measured values for sensitivity
-# see paper, Table 3
-sf7 = np.array([7, -126.5, -124.25, -120.75])
-sf8 = np.array([8, -127.25, -126.75, -124.0])
-sf9 = np.array([9, -131.25, -128.25, -127.5])
-sf10 = np.array([10, -132.75, -130.25, -128.75])
-sf11 = np.array([11, -134.5, -132.75, -128.75])
-sf12 = np.array([12, -133.25, -132.25, -132.25])
+# Based on LoRa parameters on SX1272/73 transceivers
+sf7 = np.array([7, -124, -122, -116])
+sf8 = np.array([8, -127, -125, -119])
+sf9 = np.array([9, -130, -128, -122])
+sf10 = np.array([10, -133, -130, -125])
+sf11 = np.array([11, -135, -132, -128])
+sf12 = np.array([12, -137, -135, -129])
+sensi = np.array([sf7, sf8, sf9, sf10, sf11, sf12])
 
 
-#
 # check for collisions at base station
 # Note: called before a packet (or rather node) is inserted into the list
 def checkcollision(packet):
@@ -92,18 +92,18 @@ def checkcollision(packet):
         if packetsAtBS[i].packet.processed == 1:
             processing = processing + 1
     if (processing > maxBSReceives):
-        print ("too long:", len(packetsAtBS))
+        print("too long:", len(packetsAtBS))
         packet.processed = 0
     else:
         packet.processed = 1
 
     if packetsAtBS:
-        print ("CHECK node {} (sf:{} bw:{} freq:{:.6e}) others: {}".format(
+        print("CHECK node {} (sf:{} bw:{} freq:{:.6e}) others: {}".format(
             packet.nodeid, packet.sf, packet.bw, packet.freq,
             len(packetsAtBS)))
         for other in packetsAtBS:
             if other.nodeid != packet.nodeid:
-                print (">> node {} (sf:{} bw:{} freq:{:.6e})".format(
+                print(">> node {} (sf:{} bw:{} freq:{:.6e})".format(
                     other.nodeid, other.packet.sf, other.packet.bw, other.packet.freq))
                 # simple collision
                 if frequencyCollision(packet, other.packet) \
@@ -137,47 +137,47 @@ def checkcollision(packet):
 #        |f1-f2| <= 30 kHz if f1 or f2 has bw 125
 def frequencyCollision(p1, p2):
     if abs(p1.freq - p2.freq) <= 120 and (p1.bw == 500 or p2.freq == 500):
-        print ("frequency coll 500")
+        print("frequency coll 500")
         return True
     elif abs(p1.freq - p2.freq) <= 60 and (p1.bw == 250 or p2.freq == 250):
-        print ("frequency coll 250")
+        print("frequency coll 250")
         return True
     else:
         if abs(p1.freq - p2.freq) <= 30:
-            print ("frequency coll 125")
+            print("frequency coll 125")
             return True
         # else:
-    print ("no frequency coll")
+    print("no frequency coll")
     return False
 
 
 def sfCollision(p1, p2):
     if p1.sf == p2.sf:
-        print ("collision sf node {} and node {}".format(p1.nodeid, p2.nodeid))
+        print("collision sf node {} and node {}".format(p1.nodeid, p2.nodeid))
         # p2 may have been lost too, will be marked by other checks
         return True
-    print ("no sf collision")
+    print("no sf collision")
     return False
 
 
 def powerCollision(p1, p2):
     powerThreshold = 6  # dB
-    print ("pwr: node {0.nodeid} {0.rssi:3.2f} dBm node {1.nodeid} {1.rssi:3.2f} dBm; diff {2:3.2f} dBm".format(p1, p2,
+    print("pwr: node {0.nodeid} {0.rssi:3.2f} dBm node {1.nodeid} {1.rssi:3.2f} dBm; diff {2:3.2f} dBm".format(p1, p2,
                                                                                                                round(
                                                                                                                    p1.rssi - p2.rssi,
                                                                                                                    2)))
     if abs(p1.rssi - p2.rssi) < powerThreshold:
-        print ("collision pwr both node {} and node {}".format(p1.nodeid, p2.nodeid))
+        print("collision pwr both node {} and node {}".format(p1.nodeid, p2.nodeid))
         # packets are too close to each other, both collide
         # return both packets as casualties
-        return (p1, p2)
+        return p1, p2
     elif p1.rssi - p2.rssi < powerThreshold:
         # p2 overpowered p1, return p1 as casualty
-        print ("collision pwr node {} overpowered node {}".format(p2.nodeid, p1.nodeid))
-        return (p1,)
-    print ("p1 wins, p2 lost")
+        print("collision pwr node {} overpowered node {}".format(p2.nodeid, p1.nodeid))
+        return p1,
+    print("p1 wins, p2 lost")
     # p2 was the weaker packet, return it as a casualty
-    return (p2,)
+    return p2,
 
 
 def timingCollision(p1, p2):
@@ -194,15 +194,15 @@ def timingCollision(p1, p2):
     # check whether p2 ends in p1's critical section
     p2_end = p2.addTime + p2.rectime
     p1_cs = env.now + Tpreamb
-    print ("collision timing node {} ({},{},{}) node {} ({},{})".format(
+    print("collision timing node {} ({},{},{}) node {} ({},{})".format(
         p1.nodeid, env.now - env.now, p1_cs - env.now, p1.rectime,
         p2.nodeid, p2.addTime - env.now, p2_end - env.now
     ))
     if p1_cs < p2_end:
         # p1 collided with p2 and lost
-        print ("not late enough")
+        print("not late enough")
         return True
-    print ("saved by the preamble")
+    print("saved by the preamble")
     return False
 
 
@@ -223,7 +223,7 @@ def airtime(sf, cr, pl, bw):
 
     Tsym = (2.0 ** sf) / bw
     Tpream = (Npream + 4.25) * Tsym
-    #print ("sf", sf, " cr", cr, "pl", pl, "bw", bw)
+    # print ("sf", sf, " cr", cr, "pl", pl, "bw", bw)
     payloadSymbNB = 8 + max(math.ceil((8.0 * pl - 4.0 * sf + 28 + 16 - 20 * H) / (4.0 * (sf - 2 * DE))) * (cr + 4), 0)
     Tpayload = payloadSymbNB * Tsym
     return Tpream + Tpayload
@@ -252,8 +252,8 @@ class myNode:
                 a, b = b, a
             posx = x
             posy = y
-            #posx = b * maxDist * math.cos(2 * math.pi * a / b) + bsx
-            #posy = b * maxDist * math.sin(2 * math.pi * a / b) + bsy
+            # posx = b * maxDist * math.cos(2 * math.pi * a / b) + bsx
+            # posy = b * maxDist * math.sin(2 * math.pi * a / b) + bsy
             if len(nodes) > 0:
                 for index, n in enumerate(nodes):
                     dist = np.sqrt(((abs(n.x - posx)) ** 2) + ((abs(n.y - posy)) ** 2))
@@ -264,10 +264,10 @@ class myNode:
                     else:
                         rounds = rounds + 1
                         if rounds == 100:
-                            print ("could not place new node, giving up")
+                            print("could not place new node, giving up")
                             exit(-1)
             else:
-                #print ("first node")
+                #print("first node")
                 self.x = posx
                 self.y = posy
                 found = 1
@@ -276,7 +276,6 @@ class myNode:
 
         self.packet = myPacket(self.nodeid, packetlen, self.dist)
         self.sent = 0
-
 
 
 #
@@ -320,55 +319,64 @@ class myPacket:
 
         # for experiment 3 find the best setting
         # OBS, some hardcoded values
-        Prx = self.txpow  ## zero path loss by default
+        Prx = self.txpow  # zero path loss by default
 
         # log-shadow
         Lpl = Lpld0 + 10 * gamma * math.log10(distance / d0)
-        #print ("Lpl:", Lpl)
+        #print("Lpl:", Lpl)
         Prx = self.txpow - GL - Lpl
 
-        if (experiment == 3) or (experiment == 5):
-            minairtime = 9999
-            minsf = 0
-            minbw = 0
+        minairtime = 9999
+        minsf = 0
+        minbw = 0
+        minsensi = 0
+        #print("Prx:", Prx)
 
-            #print ("Prx:", Prx)
+        for i in range(0, 6):
+            for j in range(1, 4):
+                if sensi[i, j] < Prx:
+                    self.sf = int(sensi[i, 0])
+                    if j == 1:
+                        self.bw = 125
+                    elif j == 2:
+                        self.bw = 250
+                    else:
+                        self.bw = 500
+                    at = airtime(self.sf, 1, plen, self.bw)
+                    if at < minairtime:
+                        minairtime = at
+                        minsf = self.sf
+                        minbw = self.bw
+                        minsensi = sensi[i, j]
+                ##
+                else:  # Caso nao esteja nos limites de sensibilidade
+                    minairtime = airtime(12, 1, plen, 125)
+                    minsf = 12
+                    minbw = 125
+                    minsensi = -140
+                ##
 
-            for i in range(0, 6):
-                for j in range(1, 4):
-                    #if sensi[i, j] < Prx:
-                        self.sf = int(sensi[i, 0])
-                        if j == 1:
-                            self.bw = 125
-                        elif j == 2:
-                            self.bw = 250
-                        else:
-                            self.bw = 500
-                        at = airtime(self.sf, 1, plen, self.bw)
-                        if at < minairtime:
-                            minairtime = at
-                            minsf = self.sf
-                            minbw = self.bw
-                            minsensi = sensi[i, j]
-            if minairtime == 9999:
-                print ("does not reach base station")
-                #exit(-1)
-            #print ("best sf:", minsf, " best bw: ", minbw, "best airtime:", minairtime)
-            self.rectime = minairtime
-            self.sf = minsf
-            self.bw = minbw
-            self.cr = 1
+        if minairtime == 9999:
+            print("does not reach base station")
+            # exit(-1)
 
-            if experiment == 5:
-                # reduce the txpower if there's room left
-                self.txpow = max(2, self.txpow - math.floor(Prx - minsensi))
-                Prx = self.txpow - GL - Lpl
-                #print ('minsesi {} best txpow {}'.format(minsensi, self.txpow))
+        #print("best sf:", minsf, " best bw: ", minbw, "best airtime:", minairtime)
+        self.rectime = minairtime
+        self.sf = minsf
+        self.bw = minbw
+        self.cr = 1
+
+        # reduce the txpower if there's room left
+        self.txpow = max(2, self.txpow - math.floor(Prx - minsensi))
+        # self.txpow = 20
+        Prx = self.txpow - GL - Lpl
+        #print('minsesi {} best txpow {}'.format(minsensi, self.txpow))
 
         # transmission range, needs update XXX
         # self.transRange = 150
-        self.pl = plen
         self.symTime = (2.0 ** self.sf) / self.bw
+
+        self.pl = plen
         self.arriveTime = 0
         self.rssi = Prx
         # frequencies: lower bound + number of 61 Hz steps
@@ -381,10 +389,10 @@ class myPacket:
         else:
             self.freq = 915000000
 
-        #print ("frequency", self.freq, "symTime ", self.symTime)
-        #print ("bw", self.bw, "sf", self.sf, "cr", self.cr, "rssi", self.rssi)
+        # print ("frequency", self.freq, "symTime ", self.symTime)
+        #print("bw", self.bw, "sf", self.sf, "cr", self.cr, "rssi", self.rssi)
         self.rectime = airtime(self.sf, self.cr, self.pl, self.bw)
-        #print ("rectime node ", self.nodeid, "  ", self.rectime)
+        # print ("rectime node ", self.nodeid, "  ", self.rectime)
         # denote if packet is collided
         self.collided = 0
         self.processed = 0
@@ -404,15 +412,15 @@ def transmit(env, node):
 
         node.sent = node.sent + 1
         if node in packetsAtBS:
-            print ("ERROR: packet already in")
+            print("ERROR: packet already in")
         else:
             sensitivity = sensi[node.packet.sf - 7, [125, 250, 500].index(node.packet.bw) + 1]
             if node.packet.rssi < sensitivity:
-                print ("node {}: packet will be lost".format(node.nodeid))
+                print("node {}: packet will be lost".format(node.nodeid))
                 node.packet.lost = True
             else:
                 node.packet.lost = False
-                                        #Retirado teste de colisão
+                # Retirado teste de colisão
                 # adding packet if no collision
                 # if checkcollision(node.packet) == 1:
                 #     node.packet.collided = 1
@@ -467,16 +475,19 @@ nrReceived = 0
 nrProcessed = 0
 nrLost = 0
 
-Ptx = 14  # Transmission Power
 gamma = 2.08
-d0 = 40.0
+d0 = 40.0  # Reference distance
 var = 0  # variance ignored for now, since otherwise some transmissions might not be able to reach the sink rendering our results inconclusive
 Lpld0 = 127.41  # the mean pathloss at the reference distance d0
-GL = 0
-sensi = np.array([sf7, sf8, sf9, sf10, sf11, sf12])
+GL = 0  # Transmission Gain
+
+Ptx = 14  # Transmission Power in dBm
+minsensi = np.amin(sensi)  # -134.50 dBm
+Lpl = Ptx - minsensi  # 148.50 dBm
+maxDist = d0 * (math.e ** ((Lpl - Lpld0) / (10.0 * gamma)))
 
 
-def lorasim_simulate( nrNodes, data, gtwxy, bs_id, avgSendTime=10, simtime=360000):
+def lorasim_simulate(nrNodes, data, gtwxy, bs_id, avgSendTime=10, simtime=360000):
     Rnd = random.seed(12345)
     nodes = []
     packetsAtBS = []
@@ -517,35 +528,16 @@ def lorasim_simulate( nrNodes, data, gtwxy, bs_id, avgSendTime=10, simtime=36000
     # Lpl = Ptx - minsensi
     # print ("amin", minsensi, "Lpl", Lpl)
 
-    maxDist = 1000
-    #maxDist = d0 * (math.e ** ((Lpl - Lpld0) / (10.0 * gamma)))
-    # print("maxDist:", maxDist)
+    #print("maxDist:", maxDist)
 
     # base station placement
+    print( gtwxy[bs_id, 0])
     bsx = gtwxy[bs_id, 0]
     bsy = gtwxy[bs_id, 1]
-    #bsx = maxDist + 10
-    #bsy = maxDist + 10
-    xmax = bsx + maxDist + 20
-    ymax = bsy + maxDist + 20
-
-    # prepare graphics and add sink
-    global graphics
-    global ax
-    # if graphics == 1:
-    #     plt.ion()
-    #     plt.figure()
-    #     ax = plt.gcf().gca()
-    #     # XXX should be base station position
-    #     ax.add_artist(plt.Circle((bsx, bsy), 3, fill=True, color='green'))
-    #     ax.add_artist(plt.Circle((bsx, bsy), maxDist, fill=False, color='green'))
-    #     # graphics for node
-    #     for n in nodes:
-    #         ax.add_artist(plt.Circle((n.x, n.y), 2, fill=True, color='blue'))
-    #     plt.xlim([0, xmax])
-    #     plt.ylim([0, ymax])
-    #     plt.draw()
-    #     plt.savefig("/home/jean/Documents/CEA-Project/Output/" + str(bs_id))
+    # bsx = maxDist + 10
+    # bsy = maxDist + 10
+    xmax = 10000
+    ymax = 10000
 
     for i in range(0, nrNodes):
         # myNode takes period (in ms), base station id packetlen (in Bytes)
@@ -554,8 +546,24 @@ def lorasim_simulate( nrNodes, data, gtwxy, bs_id, avgSendTime=10, simtime=36000
         nodes.append(node)
         env.process(transmit(env, node))
 
-
-
+        # prepare graphics and add sink
+    global graphics
+    global ax
+    # if graphics == 1:
+    #     plt.ion()
+    #     plt.figure()
+    #     ax = plt.gcf().gca()
+    #     # XXX should be base station position
+    #     ax.add_artist(plt.Circle((bsx, bsy), maxDist * 0.1, fill=True, color='green'))
+    #     ax.add_artist(plt.Circle((bsx, bsy), maxDist, fill=False, color='green'))
+    #     # graphics for node
+    #     for n in nodes:
+    #         ax.add_artist(plt.Circle((n.x, n.y), 50, fill=True, color='blue'))
+    #     plt.xlim([-xmax, xmax])
+    #     plt.ylim([-ymax, ymax])
+    #     plt.draw()
+    #     plt.show()
+    #     plt.savefig("/home/jean/Documents/CEA-Project/cluster/Output/" + str(bs_id))
 
     # start simulation
     # env.run(until=500000000)
@@ -571,9 +579,9 @@ def lorasim_simulate( nrNodes, data, gtwxy, bs_id, avgSendTime=10, simtime=36000
     #       82, 85, 90,  # PA_BOOST/PA1: 15..17
     #       105, 115, 125]  # PA_BOOST/PA1+PA2: 18..20
     # mA = 90    # current draw for TX = 17 dBm
-    #V = 3.0  # voltage XXX
-    #sent = sum(n.sent for n in nodes)
-    #energy = sum(node.packet.rectime * TX[int(node.packet.txpow) + 2] * V * node.sent for node in nodes) / 1e6
+    # V = 3.0  # voltage XXX
+    # sent = sum(n.sent for n in nodes)
+    # energy = sum(node.packet.rectime * TX[int(node.packet.txpow) + 2] * V * node.sent for node in nodes) / 1e6
 
     # #print "energy (in J): ", energy
     # print ("sent packets: ", sent)
@@ -636,3 +644,19 @@ def lorasim_simulate( nrNodes, data, gtwxy, bs_id, avgSendTime=10, simtime=36000
 
     return rssilist
 
+
+# x = [1, 100, 120, 110, 840, 8000, 400]
+# y = [1, 100, 120, 110, 840, 8000, 400]
+# X = np.array(list(list(a) for a in zip(x, y)))
+# for i in range(0, 4):
+#     print(X[i, 0], X[i, 1])
+# # data = np.vstack((xpts,  ypts))
+#
+# xb = [0, 1000]
+# yb = [0, 1000]
+# bs = np.array(list(list(b) for b in zip(xb, yb)))
+# print(bs[0, 0], bs[0, 1])
+#
+# rssi = lorasim_simulate(7, X, bs, 1)
+#
+# print(rssi)
