@@ -267,13 +267,15 @@ class myNode:
                             print("could not place new node, giving up")
                             exit(-1)
             else:
-                #print("first node")
+                # print("first node")
                 self.x = posx
                 self.y = posy
                 found = 1
         self.dist = np.sqrt((self.x - bsx) * (self.x - bsx) + (self.y - bsy) * (self.y - bsy))
-        #print('node %d' % nodeid, "x", self.x, "y", self.y, "dist: ", self.dist)
+        # print('node %d' % nodeid, "x", self.x, "y", self.y, "dist: ", self.dist)
 
+        if self.dist == 0:  # Caso o device esteja em cima do Gateway
+            self.dist = 0.000000000001
         self.packet = myPacket(self.nodeid, packetlen, self.dist)
         self.sent = 0
 
@@ -300,37 +302,45 @@ class myPacket:
         self.cr = random.randint(1, 4)
         self.bw = random.choice([125, 250, 500])
 
-        # for certain experiments override these
-        if experiment == 1 or experiment == 0:
-            self.sf = 12
-            self.cr = 4
-            self.bw = 125
-
-        # for certain experiments override these
-        if experiment == 2:
-            self.sf = 6
-            self.cr = 1
-            self.bw = 500
-        # lorawan
-        if experiment == 4:
-            self.sf = 12
-            self.cr = 1
-            self.bw = 125
-
         # for experiment 3 find the best setting
         # OBS, some hardcoded values
         Prx = self.txpow  # zero path loss by default
 
+        # frequencies: lower bound + number of 61 Hz steps
+        #self.freq = 860000000 + random.randint(0, 2622950)
+        #self.freq = 915000000 + random.randint(0, 2622950)
+        self.freq = 915
+
         # log-shadow
-        Lpl = Lpld0 + 10 * gamma * math.log10(distance / d0)
-        #print("Lpl:", Lpl)
-        Prx = self.txpow - GL - Lpl
+        #Lpl = Lpld0 + 10 * gamma * math.log10(distance / d0)
+
+
+        bsHeight = 30  # Base Station height in meters
+        deviceHeight = 2  # Device height in meters
+
+        # # Okumura-Hata model
+        # Lpl = 69.55 + 26.16 * math.log10(self.freq) - 13.82 * math.log10(bsHeight) - (1.1*math.log10(self.freq) - 0.7)*deviceHeight - (1.56*math.log10(self.freq) - 0.8) + (44.9 - 6.55*math.log10(bsHeight)*math.log10(distance*0.001))
+        # print(distance)
+
+        # # COST-231 Hata Model 1º
+        # Lpl = 46.3 + 33.9*math.log10(self.freq) - 13.82*math.log10(bsHeight) - 3.2*(math.log10(11.75 * bsHeight))**2 - 4.97 + (44.9 - 6.55*math.log10(bsHeight) * math.log10(distance))
+
+
+        # # COST-231 Hata Model 2º
+        # Lpl = 46.3 + 33.9 * math.log10(self.freq) - 13.82 * math.log10(bsHeight) \
+        #       - (1.1 * math.log10(self.freq) - 0.7) * deviceHeight + (1.56 * math.log10(self.freq) - 0.8) + \
+        #       (44.9 - 6.55 * math.log10(bsHeight) * math.log10(distance))
+
+        # empirical Okumura-Hata model
+        Lpl = 69.55 + 26.16 * math.log10(self.freq) - 13.82 * math.log10(bsHeight) - (3.2 * math.pow(math.log10(11.75 * deviceHeight), 2) - 4.97) + (44.9 - 6.55 * math.log10(bsHeight)) * math.log10(distance*0.001)
+
+        print("Lpl:", Lpl)
+        Prx = self.txpow + GL - Lpl
 
         minairtime = 9999
         minsf = 0
         minbw = 0
         minsensi = 0
-        #print("Prx:", Prx)
 
         for i in range(0, 6):
             for j in range(1, 4):
@@ -360,17 +370,22 @@ class myPacket:
             print("does not reach base station")
             # exit(-1)
 
-        #print("best sf:", minsf, " best bw: ", minbw, "best airtime:", minairtime)
+        # print("best sf:", minsf, " best bw: ", minbw, "best airtime:", minairtime)
         self.rectime = minairtime
         self.sf = minsf
         self.bw = minbw
         self.cr = 1
 
         # reduce the txpower if there's room left
+
         self.txpow = max(2, self.txpow - math.floor(Prx - minsensi))
-        # self.txpow = 20
-        Prx = self.txpow - GL - Lpl
-        #print('minsesi {} best txpow {}'.format(minsensi, self.txpow))
+        if self.txpow > 20:
+            self.txpow = 20
+        print('Ptx: ', self.txpow)
+        Prx = self.txpow + GL - Lpl
+        print("Prx:", Prx)
+
+        # print('minsesi {} best txpow {}'.format(minsensi, self.txpow))
 
         # transmission range, needs update XXX
         # self.transRange = 150
@@ -379,18 +394,9 @@ class myPacket:
         self.pl = plen
         self.arriveTime = 0
         self.rssi = Prx
-        # frequencies: lower bound + number of 61 Hz steps
-        self.freq = 915000000 + random.randint(0, 2622950)
-
-        # for certain experiments override these and
-        # choose some random frequences
-        if experiment == 1:
-            self.freq = random.choice([860000000, 864000000, 868000000])
-        else:
-            self.freq = 915000000
 
         # print ("frequency", self.freq, "symTime ", self.symTime)
-        #print("bw", self.bw, "sf", self.sf, "cr", self.cr, "rssi", self.rssi)
+        # print("bw", self.bw, "sf", self.sf, "cr", self.cr, "rssi", self.rssi)
         self.rectime = airtime(self.sf, self.cr, self.pl, self.bw)
         # print ("rectime node ", self.nodeid, "  ", self.rectime)
         # denote if packet is collided
@@ -476,18 +482,21 @@ nrProcessed = 0
 nrLost = 0
 
 gamma = 2.08
-d0 = 40.0  # Reference distance
+d0 = 100#40.0  # Reference distance
 var = 0  # variance ignored for now, since otherwise some transmissions might not be able to reach the sink rendering our results inconclusive
 Lpld0 = 127.41  # the mean pathloss at the reference distance d0
-GL = 0  # Transmission Gain
+GL = 4  # 0  # Transmission Gain
 
 Ptx = 14  # Transmission Power in dBm
 minsensi = np.amin(sensi)  # -134.50 dBm
 Lpl = Ptx - minsensi  # 148.50 dBm
-maxDist = d0 * (math.e ** ((Lpl - Lpld0) / (10.0 * gamma)))
+#maxDist = d0 * (math.e ** ((Lpl - Lpld0) / (10.0 * gamma)))
+maxDist = d0 * math.pow(10, (Lpl - Lpld0)/10*gamma)
+print('MaxDist: ', maxDist)
 
 
 def lorasim_simulate(nrNodes, data, gtwxy, bs_id, avgSendTime=10, simtime=360000):
+    print(data)
     Rnd = random.seed(12345)
     nodes = []
     packetsAtBS = []
@@ -528,10 +537,9 @@ def lorasim_simulate(nrNodes, data, gtwxy, bs_id, avgSendTime=10, simtime=360000
     # Lpl = Ptx - minsensi
     # print ("amin", minsensi, "Lpl", Lpl)
 
-    #print("maxDist:", maxDist)
+    # print("maxDist:", maxDist)
 
     # base station placement
-    print( gtwxy[bs_id, 0])
     bsx = gtwxy[bs_id, 0]
     bsy = gtwxy[bs_id, 1]
     # bsx = maxDist + 10
@@ -645,18 +653,16 @@ def lorasim_simulate(nrNodes, data, gtwxy, bs_id, avgSendTime=10, simtime=360000
     return rssilist
 
 
-# x = [1, 100, 120, 110, 840, 8000, 400]
-# y = [1, 100, 120, 110, 840, 8000, 400]
-# X = np.array(list(list(a) for a in zip(x, y)))
-# for i in range(0, 4):
-#     print(X[i, 0], X[i, 1])
-# # data = np.vstack((xpts,  ypts))
-#
-# xb = [0, 1000]
-# yb = [0, 1000]
-# bs = np.array(list(list(b) for b in zip(xb, yb)))
-# print(bs[0, 0], bs[0, 1])
-#
-# rssi = lorasim_simulate(7, X, bs, 1)
-#
-# print(rssi)
+x = [1, 100, 110, 120, 400, 840, 9000]
+y = [1, 100, 110, 120, 400, 840, 9000]
+X = np.array(list(list(a) for a in zip(x, y)))
+# data = np.vstack((xpts,  ypts))
+
+xb = [0, 1000]
+yb = [0, 1000]
+bs = np.array(list(list(b) for b in zip(xb, yb)))
+print(bs[0, 0], bs[0, 1])
+
+rssi = lorasim_simulate(7, X, bs, 0)
+
+print(rssi)

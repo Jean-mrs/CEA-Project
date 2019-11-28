@@ -12,25 +12,20 @@ from cluster.optimalK_methods.fuzzy_gap_statistics import gap_statistics_fuzzy
 
 # Data Setup
 points = 7
-axis_range = 10000
+axis_range = 1000
 #X, y = make_blobs(1000, n_features=2, centers=15)
 
 for w in range(1):
-    # x = [random.randint(1, axis_range) for j in range(points)]
-    # y = [random.randint(1, axis_range) for i in range(points)]
+    x = [random.randint(1, axis_range) for j in range(points)]
+    y = [random.randint(1, axis_range) for i in range(points)]
     # X = np.array(list(list(x) for x in zip(x, y)))
-    x = [1, 100, 120, 110, 840, 8000, 400]
-    y = [1, 100, 120, 110, 840, 8000, 400]
+    # x = [1, 100, 120, 110, 840, 8000, 400]
+    # y = [1, 100, 120, 110, 840, 8000, 400]
     X = np.array(list(list(a) for a in zip(x, y)))
     fig1 = plt.figure()
     plt.scatter(X[:, 0], X[:, 1], s=4)
     #plt.savefig("/home/jean/public_html/Sim_2000x33_Limit70/Data_Users_" + str(points) + '_Sim' + str(w))
     #plt.savefig("/home/jean/Documents/CEA-Project/Output/Data_Users_" + str(axis_range) + '_Sim' + str(w))
-
-    xpts = X[:, 0]
-    ypts = X[:, 1]
-    alldata = np.vstack((xpts,  ypts))
-
     # Fuzzy Gap Statistics
     k, gapdfs1, gapsk6 = gap_statistics_fuzzy(X, nrefs=1, maxClusters=30, nnodes=points)
     print('New C: ', k)
@@ -56,9 +51,9 @@ for w in range(1):
     #plt.savefig("/home/jean/public_html/Sim_2000x33_Limit70/Gap_Final_Values:" + str(points) + "_Best" + '_Sim' + str(w))
 
     # Fuzzy C-Means Algorithm
-    cntr, u, u0, d, jm, p, fpc = cmeans(data=alldata, c=k, m=2, error=0.005, maxiter=2, init=None, nnodes=points)
+    cntr, u, u0, d, jm, p, fpc = cmeans(data=X.T, c=k, m=2, error=0.005, maxiter=2, init=None, nnodes=points)
 
-    cntr1, u1, u01, d1, jm1, p1, fpc1 = cmeans(data=alldata, c=k, m=2, error=0.005, maxiter=2, init=None, nnodes=points,testsensi=True, bstation=cntr)
+    cntr1, u1, u01, d1, jm1, p1, fpc1 = cmeans(data=X.T, c=k, m=2, error=0.005, maxiter=2, init=None, nnodes=points,testsensi=True, bstation=cntr)
     print(pd.DataFrame(d1))
     #print("Euclidian Distance Matrix: ")
     #pprint(cntr)
