@@ -7,20 +7,17 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import random
 import sys
-from cluster.fuzzycmeans.cmeans_algorithm import cmeans
+from cluster.fuzzycmeans.cmeans_algorithm import cmeans, minimize_outlier
 from cluster.optimalK_methods.fuzzy_gap_statistics import gap_statistics_fuzzy
 
 # Data Setup
 points = 7
-axis_range = 1000
+axis_range = 10000
 #X, y = make_blobs(1000, n_features=2, centers=15)
 
 for w in range(1):
     x = [random.randint(1, axis_range) for j in range(points)]
     y = [random.randint(1, axis_range) for i in range(points)]
-    # X = np.array(list(list(x) for x in zip(x, y)))
-    # x = [1, 100, 120, 110, 840, 8000, 400]
-    # y = [1, 100, 120, 110, 840, 8000, 400]
     X = np.array(list(list(a) for a in zip(x, y)))
     fig1 = plt.figure()
     plt.scatter(X[:, 0], X[:, 1], s=4)
@@ -54,6 +51,9 @@ for w in range(1):
     cntr, u, u0, d, jm, p, fpc = cmeans(data=X.T, c=k, m=2, error=0.005, maxiter=2, init=None, nnodes=points)
 
     cntr1, u1, u01, d1, jm1, p1, fpc1 = cmeans(data=X.T, c=k, m=2, error=0.005, maxiter=2, init=None, nnodes=points,testsensi=True, bstation=cntr)
+
+    c = minimize_outlier(d1, k)
+
     print(pd.DataFrame(d1))
     #print("Euclidian Distance Matrix: ")
     #pprint(cntr)

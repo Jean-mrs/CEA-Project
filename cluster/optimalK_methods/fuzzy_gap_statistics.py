@@ -91,5 +91,7 @@ def gap_statistics_fuzzy(data, nnodes, nrefs=3, maxClusters=15):
     else:
         k = min(iter_points_sk)
 
+
+
     return k, resultsdf, gp
 

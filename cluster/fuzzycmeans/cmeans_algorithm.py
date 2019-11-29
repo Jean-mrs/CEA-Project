@@ -336,8 +336,28 @@ def sensi_limit(d, data, k, nnodes, cntr):
         for j in range(0, len(distances.columns)):
             if sensibility.iat[i, j] < -137:
                 distances.iat[i, j] = 10000
-    print(sensibility)
+    #print(sensibility)
     return np.array(distances)
+
+
+def minimize_outlier(data, k):
+    outlier = True
+    df = pd.DataFrame(data)
+    while outlier:
+        cont = 0
+        for column in df.columns[0:]:
+            a = 0
+            print(df[column])
+            for item in df[column]:
+                if item == 10000:
+                    a += 1
+            if a == k:
+                k += 1
+            else:
+                cont += 1
+        if cont ==
+
+    return k
 
 
 def points_limit(data, k, nnodes, maxPoints=100):

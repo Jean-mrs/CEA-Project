@@ -91,7 +91,7 @@ def checkcollision(packet):
     for i in range(0, len(packetsAtBS)):
         if packetsAtBS[i].packet.processed == 1:
             processing = processing + 1
-    if (processing > maxBSReceives):
+    if processing > maxBSReceives:
         print("too long:", len(packetsAtBS))
         packet.processed = 0
     else:
@@ -279,7 +279,36 @@ class myNode:
         self.packet = myPacket(self.nodeid, packetlen, self.dist)
         self.sent = 0
 
+def count(mat, val): #conta quantos vezes o val aparece na matriz mat
+    cnt = 0
+    for i in range(mat.shape[0]):
+        for j in range(mat.shape[1]):
+            if mat[i,j]> val:
+                cnt += 1
+    return cnt
 
+def exploraSF(rssi, sfvector):
+    sensi = -133.25
+    # self.sfvector = sfvector
+    D = len(sfvector) #quantidade de EDs que podem se comunicar(RSSI<sensibility)
+    SFset = [7, 8, 9, 10, 11, 12]
+    l = len(SFset)
+    for i in range(len(SFset)):
+        cnt = count(rssi,sensi)
+        if cnt > D/l:
+            z = D/l
+        else:
+            z = cnt
+        for p in range(z+2):
+            x = np.argwhere(rssi==np.max(rssi))[0][0]
+            y = np.argwhere(rssi==np.max(rssi))[0][1]
+            sfvector[y] = SFset[i-6]
+            rssi[:,y] = -200
+            D = D - 1
+        l = l - 1
+    return sfvector
+
+#
 #
 # this function creates a packet (associated with a node)
 # it also sets all parameters, currently random
@@ -296,6 +325,9 @@ class myPacket:
 
         self.nodeid = nodeid
         self.txpow = Ptx
+
+        global sfVector
+        global minsensi
 
         # randomize configuration values
         self.sf = random.randint(6, 12)
@@ -334,8 +366,11 @@ class myPacket:
         # empirical Okumura-Hata model
         Lpl = 69.55 + 26.16 * math.log10(self.freq) - 13.82 * math.log10(bsHeight) - (3.2 * math.pow(math.log10(11.75 * deviceHeight), 2) - 4.97) + (44.9 - 6.55 * math.log10(bsHeight)) * math.log10(distance*0.001)
 
-        print("Lpl:", Lpl)
+        # print("Lpl:", Lpl)
         Prx = self.txpow + GL - Lpl
+
+        # SF vector to know how many devices are in especific SF
+        sfVector[int(self.sf) - 6] += 1
 
         minairtime = 9999
         minsf = 0
@@ -377,20 +412,19 @@ class myPacket:
         self.cr = 1
 
         # reduce the txpower if there's room left
-
         self.txpow = max(2, self.txpow - math.floor(Prx - minsensi))
         if self.txpow > 20:
             self.txpow = 20
-        print('Ptx: ', self.txpow)
+        # print('Ptx: ', self.txpow)
         Prx = self.txpow + GL - Lpl
-        print("Prx:", Prx)
+        # print("Prx:", Prx)
 
+        sfVector[int(self.sf) - 6] += 1
         # print('minsesi {} best txpow {}'.format(minsensi, self.txpow))
 
         # transmission range, needs update XXX
         # self.transRange = 150
         self.symTime = (2.0 ** self.sf) / self.bw
-
         self.pl = plen
         self.arriveTime = 0
         self.rssi = Prx
@@ -402,6 +436,8 @@ class myPacket:
         # denote if packet is collided
         self.collided = 0
         self.processed = 0
+
+        self.lost = self.rssi < minsensi
 
 
 #
@@ -485,18 +521,16 @@ gamma = 2.08
 d0 = 100#40.0  # Reference distance
 var = 0  # variance ignored for now, since otherwise some transmissions might not be able to reach the sink rendering our results inconclusive
 Lpld0 = 127.41  # the mean pathloss at the reference distance d0
-GL = 4  # 0  # Transmission Gain
+GL = 0  # Transmission Gain
 
 Ptx = 14  # Transmission Power in dBm
 minsensi = np.amin(sensi)  # -134.50 dBm
 Lpl = Ptx - minsensi  # 148.50 dBm
 #maxDist = d0 * (math.e ** ((Lpl - Lpld0) / (10.0 * gamma)))
 maxDist = d0 * math.pow(10, (Lpl - Lpld0)/10*gamma)
-print('MaxDist: ', maxDist)
 
 
 def lorasim_simulate(nrNodes, data, gtwxy, bs_id, avgSendTime=10, simtime=360000):
-    print(data)
     Rnd = random.seed(12345)
     nodes = []
     packetsAtBS = []
@@ -652,17 +686,17 @@ def lorasim_simulate(nrNodes, data, gtwxy, bs_id, avgSendTime=10, simtime=360000
 
     return rssilist
 
-
-x = [1, 100, 110, 120, 400, 840, 9000]
-y = [1, 100, 110, 120, 400, 840, 9000]
-X = np.array(list(list(a) for a in zip(x, y)))
-# data = np.vstack((xpts,  ypts))
-
-xb = [0, 1000]
-yb = [0, 1000]
-bs = np.array(list(list(b) for b in zip(xb, yb)))
-print(bs[0, 0], bs[0, 1])
-
-rssi = lorasim_simulate(7, X, bs, 0)
-
-print(rssi)
+#
+# x = [1, 100, 110, 120, 400, 840, 9000]
+# y = [1, 100, 110, 120, 400, 840, 9000]
+# X = np.array(list(list(a) for a in zip(x, y)))
+# # data = np.vstack((xpts,  ypts))
+#
+# xb = [0, 1000]
+# yb = [0, 1000]
+# bs = np.array(list(list(b) for b in zip(xb, yb)))
+# print(bs[0, 0], bs[0, 1])
+#
+# rssi = lorasim_simulate(7, X, bs, 0)
+#
+# print(rssi)
